@@ -1,4 +1,3 @@
-from graphics import *
 import FitCurves
 from numpy import *
 
@@ -76,7 +75,7 @@ def bezier_position(c, t):
 def bezier_der(c, t):
     # return (c.p0 * (-3 * (1 - t) * (1 - t))) + (c.h0 * 3 * ((1 - 4 * t) + (3 * t * t))) + (
     #     c.h1 * 3 * ((2 * t) - (3 * t * t))) + (c.p1 * 3 * t * t)
-    return ((c.h0 - c.h1) * 3.0 * (1-t) * (1-t)) + ((c.h1 - c.h0) * 6 * (1 - t) * t) + ((c.p1 - c.h1) * 3 * t * t)
+    return ((c.h0 - c.h1) * 3.0 * (1 - t) * (1 - t)) + ((c.h1 - c.h0) * 6 * (1 - t) * t) + ((c.p1 - c.h1) * 3 * t * t)
 
 
 def bezier_der2(c, t):
@@ -91,7 +90,7 @@ def normal(p):
 def curvature_by_t(c, t):
     der1 = bezier_der(c, t)
     der2 = bezier_der2(c, t)
-    return (der1.x * der2.y) - ((der1.y * der2.x) * pow(normal(der1), 3))
+    return (der1.x * der2.y) - (der1.y * der2.x) * pow(normal(der1), 3)
 
 
 def split_by_parameters(c, c0, c1, t):
@@ -227,10 +226,22 @@ def translate_to_curve(arr):
             curve_list.append(c)
     return curve_list
 
+def find_circle_by_points(p1, p2, p3):
+    a = p1.x * (p2.y - p3.y) - p1.y * (p2.x - p3.x) + p2.x * p3.y - p3.x * p2.y
+    b = (pow(p1.x, 2) + pow(p1.y, 2)) * (p3.y - p2.y) + (pow(p2.x, 2) + pow(p2.y, 2)) * (p1.y - p3.y) + (pow(p3.x, 2) + pow(p3.y, 2)) * (p2.y - p1.y)
+    c = (pow(p1.x, 2) + pow(p1.y, 2)) * (p2.x - p3.x) + (pow(p2.x, 2) + pow(p2.y, 2)) * (p3.x - p1.x) + (pow(p3.x, 2) + pow(p3.y, 2)) * (p1.x - p2.x)
+    d = (pow(p1.x, 2) + pow(p1.y, 2)) * (p3.x * p2.y - p2.x * p3.y) + (pow(p2.x, 2) + pow(p2.y, 2)) * (p1.x * p3.y - p3.x * p1.y) + (pow(p3.x, 2) + pow(p3.y, 2)) * (p2.x * p1.y - p1.x * p2.y)
+    radius = sqrt((b * b + c * c - 4 * a * d) / (4 * a * a))
+    center_x = -b / (2 * a)
+    center_y= -c / (2 * a)
+    area = pi * radius * radius
+    perimeter = 2 * pi * radius
+    return [radius, Vector2D(center_x, center_y), area, perimeter]
+
 
 def main():
-    # curve = FitCurves.fitCurve(
-    #     array([array([0, 100]), array([100, 0]), array([200, 100]), array([100, 200]), array([0, 100])]), 0.001)
+    curve = FitCurves.fitCurve(
+        array([array([0, 100]), array([100, 0]), array([200, 100]), array([100, 200]), array([0, 100])]), 0.001)
 
     # p = translate_to_curve(curve)
     # c = Curve(Vector2D(0, 2), Vector2D(0, 0), Vector2D(2, 2), Vector2D(2, 0))
@@ -241,20 +252,17 @@ def main():
          Curve(Vector2D(10, 0), Vector2D(15, 0), Vector2D(20, 5), Vector2D(20, 10)),
          Curve(Vector2D(20, 10), Vector2D(20, 15), Vector2D(15, 20), Vector2D(10, 20)),
          Curve(Vector2D(10, 20), Vector2D(5, 20), Vector2D(0, 15), Vector2D(0, 10))]
-    win = GraphWin()
 
-    for curve in p:
-        for i in xrange(1, 10):
-            p = bezier_position(curve, i / 10.0)
-            pp = Point(p.x, p.y)
-            pp.setFill("black")
-            pp.draw(win)
-            print curvature_by_t(curve, i / 10.0)
+    # for curve in p:
+    #     for i in xrange(1, 10):
+    #       p = bezier_position(curve, i / 10.0)
+    #       print curvature_by_t(curve, i / 10.0)
 
-    raw_input("die")
-    win.close()
-
-    # print get_length_by_time(c, 4)
+    #       print get_length_by_time(c, 4)
+    # print "{}, {}".format(bezier_der(p[0], 0.5), bezier_der(p[2], 0.5))
+    # print "{}, {}".format(curvature_by_t(p[0], 0.5), curvature_by_t(p[2], 0.5))
+    outp = find_circle_by_points(Vector2D(0,0), Vector2D(1,1), Vector2D(2,0))
+    print "{} {}".format(outp[0], outp[1])
 
 
 main()
