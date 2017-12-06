@@ -66,6 +66,29 @@ class Curve:
         self.p1 = l[3]
 
 
+class LinearEquation:
+    def __init__(self, p, m):
+        self.p = p
+        self.m = m
+
+    def find_points_by_length(self, r):
+        a = (pow(self.m, 2) + 1)
+        b = (2 * pow(self.m, 2) * self.p.x) - (2 * self.p.x)
+        c = (- pow(r, 2)) + pow(self.p.x, 2) + (pow(self.m, 2) * self.p.x)
+
+        d = b ** 2 - 4 * a * c  # discriminant
+
+        if d < 0:
+            print ("Error delta is less than 0")
+        elif d == 0:
+            x = (-b + math.sqrt(b ** 2 - 4 * a * c)) / 2 * a
+            return [Vector2D(x, (self.m*x) - (self.m * self.p.x) + self.p.y)]
+        else:
+            x1 = (-b + math.sqrt((b ** 2) - (4 * (a * c)))) / (2 * a)
+            x2 = (-b - math.sqrt((b ** 2) - (4 * (a * c)))) / (2 * a)
+            return [Vector2D(x1, (self.m*x1) - (self.m * self.p.x) + self.p.y), Vector2D(x2, (self.m*x2) - (self.m * self.p.x) + self.p.y)]
+
+
 def bezier_position(c, t):
     t = float(t)
     omt = 1 - t
@@ -298,6 +321,11 @@ def find_circle_in_curve(c, t0=0.0, t1=1.0, res=1):
         else:
             t1 = tc
 
+
+def find_parallel_curve(c, cr):
+    pass
+
+
 def main():
     curve = FitCurves.fitCurve(
         array([array([0, 1]), array([1, 0]), array([2, 1]), array([1, 2]), array([0, 1])]), 0.001)
@@ -313,20 +341,20 @@ def main():
     #      Curve(Vector2D(0, -1), Vector2D(-c, -1), Vector2D(-1, -c), Vector2D(-1, 0)),
     #      Curve(Vector2D(-1, 0), Vector2D(-1, c), Vector2D(-c, 1), Vector2D(0, 1))]
 
-    for i, curve in enumerate(p):
-        cr = find_circle_in_curve(curve, res=0.01)
-        print "-------curve {}------".format(i+1)
-        for c in cr:
-            print "t:{}: {}, {}".format(c[0], c[1][0], c[1][1])
-        # for i in xrange(1, 10):
-        #   p = bezier_position(curve, i / 10.0)
-        #   print curvature_by_t(curve, i / 10.0)
+    # for i, curve in enumerate(p):
+    #     cr = find_circle_in_curve(curve, res=0.01)
+    #     print "-------curve {}------".format(i + 1)
+    #     for c in cr:
+    #         print "t:{}: {}, {}".format(c[0], c[1][0], c[1][1])
+    # for i in xrange(1, 10):
+    #   p = bezier_position(curve, i / 10.0)
+    #   print curvature_by_t(curve, i / 10.0)
 
-        #       print get_length_by_time(c, 4)
-        # print "{}, {}".format(bezier_der(p[0], 0.5), bezier_der(p[2], 0.5))
-        # print "{}, {}".format(curvature_by_t(p[0], 0.5), curvature_by_t(p[2], 0.5))
-        # outp = find_circle_by_points(Vector2D(0, 0), Vector2D(1, 1), Vector2D(2, 0))
-        # print "{} {}".format(outp[0], outp[1])
+    #       print get_length_by_time(c, 4)
+    # print "{}, {}".format(bezier_der(p[0], 0.5), bezier_der(p[2], 0.5))
+    # print "{}, {}".format(curvature_by_t(p[0], 0.5), curvature_by_t(p[2], 0.5))
+    # outp = find_circle_by_points(Vector2D(0, 0), Vector2D(1, 1), Vector2D(2, 0))
+    # print "{} {}".format(outp[0], outp[1])
 
 
 main()
