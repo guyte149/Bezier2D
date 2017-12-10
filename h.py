@@ -1,5 +1,8 @@
 import FitCurves
 from numpy import *
+import matplotlib.pyplot as plt
+from graphics import *
+import time
 
 
 class Vector2D:
@@ -42,6 +45,9 @@ class Vector2D:
     def __str__(self):
         return "({}, {})".format(self.x, self.y)
 
+    def slope(self, other):
+        return (other.y - self.y) / (other.x / self.x)
+
 
 class Curve:
     # a curve is a list of 4 points. two are points and two are headers
@@ -76,17 +82,19 @@ class LinearEquation:
         b = (2 * pow(self.m, 2) * self.p.x) - (2 * self.p.x)
         c = (- pow(r, 2)) + pow(self.p.x, 2) + (pow(self.m, 2) * self.p.x)
 
+        print "{}, {}, {}".format(a, b, c)
         d = b ** 2 - 4 * a * c  # discriminant
 
         if d < 0:
             print ("Error delta is less than 0")
         elif d == 0:
             x = (-b + math.sqrt(b ** 2 - 4 * a * c)) / 2 * a
-            return [Vector2D(x, (self.m*x) - (self.m * self.p.x) + self.p.y)]
+            return [Vector2D(x, (self.m * x) - (self.m * self.p.x) + self.p.y)]
         else:
             x1 = (-b + math.sqrt((b ** 2) - (4 * (a * c)))) / (2 * a)
             x2 = (-b - math.sqrt((b ** 2) - (4 * (a * c)))) / (2 * a)
-            return [Vector2D(x1, (self.m*x1) - (self.m * self.p.x) + self.p.y), Vector2D(x2, (self.m*x2) - (self.m * self.p.x) + self.p.y)]
+            return [Vector2D(x1, (self.m * x1) - (self.m * self.p.x) + self.p.y),
+                    Vector2D(x2, (self.m * x2) - (self.m * self.p.x) + self.p.y)]
 
 
 def bezier_position(c, t):
@@ -290,6 +298,8 @@ def find_circle_in_curve(c, t0=0.0, t1=1.0, res=1):
     working = True
     ret = []
     while working:
+        if t0 == 1:
+            return ret
         tc = t0 + (t1 - t0) / 2.0
         p0 = bezier_position(c, t0)
         p1 = bezier_position(c, t1)
@@ -316,31 +326,85 @@ def find_circle_in_curve(c, t0=0.0, t1=1.0, res=1):
             ret.append([t1, circle])
             t0 = t1
             t1 = 1
-            if t0 == 1:
-                return ret
         else:
             t1 = tc
 
 
-def find_parallel_curve(c, cr):
-    pass
+def find_current_circle(t, cr):
+    for circle in cr:
+        if t <= circle[0]:
+            return circle[1]
+
+
+def find_parallel_curve(l, c, cr, res):
+    plus_array = []
+    minus_array = []
+    for t in xrange(1, res + 1):
+        circle_t = find_current_circle(t, cr)
+        point_t = bezier_position(c, t / res)
+        if circle_t is None or circle_t[1] is None:
+            point_t1 = bezier_position(c, t-0.5/res)
+            slope_t = -1.0 /((point_t.y - point_t1.y) / (point_t.x - point_t1.x))
+        else:
+            slope_t = point_t.slope(circle_t[1])
+
+        ln = LinearEquation(point_t, slope_t)
+        points = ln.find_points_by_length(l)
+
+        plus_array.append(array([points[0].x, points[0].y]))
+        minus_array.append((array([points[1].x, points[1].y])))
+    # return plus_array, minus_array
+    plus_curve = FitCurves.fitCurve(array(plus_array), 0.001)
+    minus_curve = FitCurves.fitCurve(array(minus_array), 0.001)
+
+    plus = translate_to_curve(plus_curve)
+    minus = translate_to_curve(minus_curve)
+
+    return [plus, minus]
 
 
 def main():
-    curve = FitCurves.fitCurve(
-        array([array([0, 1]), array([1, 0]), array([2, 1]), array([1, 2]), array([0, 1])]), 0.001)
+    win = GraphWin()
+    c = Curve(Vector2D(0, 0), Vector2D(0, 10), Vector2D(10, 0), Vector2D(10, 10))
+    cr = find_circle_in_curve(c, res=0.01)
+    print "we got a cr"
+    p, m = find_parallel_curve(5, c, cr, 100)
 
-    p = translate_to_curve(curve)
+    for i in xrange(1, 101):
+        point = bezier_position(c, i / 100.0)
+        pp = Point(point.x, point.y)
+        pp.setFill("black")
+        pp.draw(win)
+
+    for curv in p:
+        for i in xrange(1, 101):
+            point = bezier_position(curv, i / 100.0)
+            pp = Point(point.x, point.y)
+            pp.setFill("blue")
+            pp.draw(win)
+            time.sleep(0.5)
+
+    win.show()
+    # for curv in m:
+    #     for i in xrange(1, 101):
+    #         point = bezier_position(curv, i / 100)
+    #         ps2.append([point.x, point.y])
+    # # plt.plot(ps2)
+    # plt.show()
+    # curve = FitCurves.fitCurve(
+    #     array([array([0, 1]), array([1, 0]), array([2, 1]), array([1, 2]), array([0, 1])]), 0.001)
+
+    # # p = translate_to_curve(curve)
     # c = Curve(Vector2D(0, 2), Vector2D(0, 0), Vector2D(2, 2), Vector2D(2, 0))
     # c.set_linear()
-
+    #
     # c0, c1 = split_by_parameters(c, Curve(), Curve(), 0.5)
     # c = 0.551915024494
     # p = [Curve(Vector2D(0, 1), Vector2D(c, 1), Vector2D(1, c), Vector2D(1, 0)),
     #      Curve(Vector2D(1, 0), Vector2D(1, -c), Vector2D(c, -1), Vector2D(0, -1)),
     #      Curve(Vector2D(0, -1), Vector2D(-c, -1), Vector2D(-1, -c), Vector2D(-1, 0)),
     #      Curve(Vector2D(-1, 0), Vector2D(-1, c), Vector2D(-c, 1), Vector2D(0, 1))]
-
+    #
     # for i, curve in enumerate(p):
     #     cr = find_circle_in_curve(curve, res=0.01)
     #     print "-------curve {}------".format(i + 1)
