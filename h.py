@@ -82,7 +82,6 @@ class LinearEquation:
         b = (2 * pow(self.m, 2) * self.p.x) - (2 * self.p.x)
         c = (- pow(r, 2)) + pow(self.p.x, 2) + (pow(self.m, 2) * self.p.x)
 
-        print "{}, {}, {}".format(a, b, c)
         d = b ** 2 - 4 * a * c  # discriminant
 
         if d < 0:
