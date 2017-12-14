@@ -113,14 +113,18 @@ def bezier_der2(c, t):
     return ((c.h1 - (c.h0 * 2) + c.p0) * 6 * (1 - t)) + ((c.p1 - (c.h1 * 2) + c.h0) * 6 * t)
 
 
-def normal(p):
+def length(p):
     return sqrt(float(pow(p.x, 2)) + float(pow(p.y, 2)))
+
+
+def normalize(v):
+    return v * (1 / length(v))
 
 
 def curvature_by_t(c, t):
     der1 = bezier_der(c, t)
     der2 = bezier_der2(c, t)
-    return (der1.x * der2.y) - (der1.y * der2.x) * pow(normal(der1), 3)
+    return (der1.x * der2.y) - (der1.y * der2.x) * pow(length(der1), 3)
 
 
 def split_by_parameters(c, c0, c1, t):
@@ -342,8 +346,8 @@ def find_parallel_curve(l, c, cr, res):
         circle_t = find_current_circle(t, cr)
         point_t = bezier_position(c, t / res)
         if circle_t is None or circle_t[1] is None:
-            point_t1 = bezier_position(c, t-0.5/res)
-            slope_t = -1.0 /((point_t.y - point_t1.y) / (point_t.x - point_t1.x))
+            point_t1 = bezier_position(c, t - 0.5 / res)
+            slope_t = -1.0 / ((point_t.y - point_t1.y) / (point_t.x - point_t1.x))
         else:
             slope_t = point_t.slope(circle_t[1])
 
@@ -362,12 +366,34 @@ def find_parallel_curve(l, c, cr, res):
     return [plus, minus]
 
 
+def find_parallel_curve_2(c, cr, d, res):
+    top_array = []
+    bot_array = []
+
+    for t in xrange(0, res + 1):
+        curr_point = bezier_position(c, t / res)
+        curr_circle = find_current_circle(t, cr)
+        mid_vector = curr_circle[1] - curr_point
+
+        norm = normalize(mid_vector) * d
+        top_array.append(curr_point + norm)
+        bot_array.append(curr_point - norm)
+
+    plus_curve = FitCurves.fitCurve(array(top_array), 0.001)
+    minus_curve = FitCurves.fitCurve(array(bot_array), 0.001)
+
+    plus = translate_to_curve(plus_curve)
+    minus = translate_to_curve(minus_curve)
+
+    return [plus, minus]
+
+
 def main():
     win = GraphWin()
     c = Curve(Vector2D(0, 0), Vector2D(0, 10), Vector2D(10, 0), Vector2D(10, 10))
     cr = find_circle_in_curve(c, res=0.01)
     print "we got a cr"
-    p, m = find_parallel_curve(5, c, cr, 100)
+    p, m = find_parallel_curve_2(c, cr, 5, 100)
 
     for i in xrange(1, 101):
         point = bezier_position(c, i / 100.0)
