@@ -104,7 +104,7 @@ def bezier_position(c, t):
 
 def bezier_der(c, t):
     return (c.p0 * (-3 * (1 - t) * (1 - t))) + (c.h0 * 3 * ((1 - 4 * t) + (3 * t * t))) + (
-            c.h1 * 3 * ((2 * t) - (3 * t * t))) + (c.p1 * 3 * t * t)
+        c.h1 * 3 * ((2 * t) - (3 * t * t))) + (c.p1 * 3 * t * t)
     # return ((c.h0 - c.h1) * 3.0 * (1 - t) * (1 - t)) + ((c.h1 - c.h0) * 6 * (1 - t) * t) + ((c.p1 - c.h1) * 3 * t * t)
 
 
@@ -115,6 +115,9 @@ def bezier_der2(c, t):
 
 def length(p):
     return sqrt(float(pow(p.x, 2)) + float(pow(p.y, 2)))
+
+def length2(p):
+    return float(pow(p.x, 2)) + float(pow(p.y, 2))
 
 
 def normalize(v):
@@ -263,8 +266,8 @@ def translate_to_curve(arr):
 
 def find_circle_by_points(p1, p2, p3, tol=0.001):
     if (in_range(p1.x, p2.x, tol) and in_range(p1.y, p2.y, tol)) or (
-            in_range(p2.x, p3.x, tol) and in_range(p2.y, p3.y, tol)) or (
-            in_range(p1.x, p3.x, tol) and in_range(p1.y, p3.y, tol)):
+                in_range(p2.x, p3.x, tol) and in_range(p2.y, p3.y, tol)) or (
+                in_range(p1.x, p3.x, tol) and in_range(p1.y, p3.y, tol)):
         print "error some points are on the same line"
         return [None, Vector2D(0, 0), 0, 0]
 
@@ -280,7 +283,7 @@ def find_circle_by_points(p1, p2, p3, tol=0.001):
                                                                                                              2) + pow(
         p3.y, 2)) * (p1.x - p2.x)
     d = (pow(p1.x, 2) + pow(p1.y, 2)) * (p3.x * p2.y - p2.x * p3.y) + (pow(p2.x, 2) + pow(p2.y, 2)) * (
-            p1.x * p3.y - p3.x * p1.y) + (pow(p3.x, 2) + pow(p3.y, 2)) * (p2.x * p1.y - p1.x * p2.y)
+        p1.x * p3.y - p3.x * p1.y) + (pow(p3.x, 2) + pow(p3.y, 2)) * (p2.x * p1.y - p1.x * p2.y)
     if a == 0:
         return [None, Vector2D(0, 0), 0, 0]
     radius = sqrt((b * b + c * c - 4 * a * d) / (4 * a * a))
@@ -296,8 +299,25 @@ def in_range(c_num, num, tol):
 def distance_points(p0, p1):
     return sqrt(pow(p1.x - p0.x, 2) + pow(p1.y - p0.y, 2))
 
+def distance_line(p, ps, pe):
+    V = pe - ps
+    W = p - ps
+    Dot = dot(V, W)
+    if Dot <=0:
+        return length(W)
 
-def find_circle_in_curve(c, t0=0.0, t1=1.0, res=1):
+    SqrNorm = length2(V)
+    if SqrNorm <= Dot:
+        W = p - pe
+        return length(W)
+
+    T = Dot / SqrNorm
+    norm = W - (V * T)
+    return length(norm)
+
+
+
+def find_circle_in_curve(c, t0=0.0, t1=1.0, tol=1):
     working = True
     ret = []
     while working:
@@ -307,25 +327,31 @@ def find_circle_in_curve(c, t0=0.0, t1=1.0, res=1):
         p0 = bezier_position(c, t0)
         p1 = bezier_position(c, t1)
         pc = bezier_position(c, tc)
-        if distance_points(p0, p1) < 0.1:
+        if distance_points(p0, p1) < tol:
             ret.append([t1, [0, (p0, p1)]])
             t0 = t1
             t1 = 1
             continue
         circle = find_circle_by_points(p0, pc, p1)
-        if circle[0] is None or circle[1] is None:
-            ret.append([t1, [0, (p0, p1)]])
-            t0 = t1
-            t1 = 1
-            continue
+
         te0 = t0 + (tc - t0) / 2.0
         te1 = tc + (tc - t0) / 2.0
 
         pte0 = bezier_position(c, te0)
         pte1 = bezier_position(c, te1)
+
+        if circle[0] is None or circle[1] is None:
+            if distance_line(pte0, p0, p1) < tol and distance_line(pte1, p0, p1) < tol:
+                ret.append([t1, [0, (p0, p1)]])
+                t0 = t1
+                t1 = 1
+                continue
+            t1 = tc
+            continue
+
         r0 = distance_points(pte0, circle[1])
         r1 = distance_points(pte1, circle[1])
-        if in_range(r0, circle[0], res) and in_range(r1, circle[0], res):
+        if in_range(r0, circle[0], tol) and in_range(r1, circle[0], tol):
             ret.append([t1, circle])
             t0 = t1
             t1 = 1
@@ -433,78 +459,58 @@ def plot_point(l):
     plt.plot(llist[0], llist[1])
 
 
+def find_parallel(c, d, res):
+    ret = []
+    for cc in c:
+        p, m = find_parallel_curve_3(cc, d, res)
+        ret.append([p, m])
+    return ret
+
+
 def main():
+    # aa = array([array([0, 0]), array([0, 0.05]), array([1.995, 1.495]), array([2, 1.5])])
+    # a = FitCurves.fitCurve(aa, 0.00001)
+    # c = translate_to_curve(a)
+
     c = Curve(Vector2D(0, 0), Vector2D(0, 1), Vector2D(1, 0), Vector2D(1, 1))
+    # c2 = Curve(Vector2D(1, 1), Vector2D(1.45, 1), Vector2D(2, 0.45), Vector2D(2, 0))
+    # c = [c1, c2]
+
     # c.set_linear()
-    # cr = find_circle_in_curve(c, res=0.01)
+    cr = find_circle_in_curve(c, tol=0.001)
 
-    # print cr
-    # for cir in cr:
-    #     if cir[1][0] == 0:
-    #         plt.plot([cir[1][1][0].x, cir[1][1][1].x], [cir[1][1][0].y, cir[1][1][1].y])
-    #     else:
-    #         plt.Circle((cir[1][1].x, cir[1][1].y), cir[1[0]])
+    fig, ax = plt.subplots()
+    for cir in cr:
+        print cir
+        if cir[1][0] == 0:
+            plt.plot([cir[1][1][0].x, cir[1][1][1].x], [cir[1][1][0].y, cir[1][1][1].y])
+        else:
+            c1 = plt.Circle((cir[1][1].x, cir[1][1].y), cir[1][0], Fill=False)
+            ax.add_artist(c1)
     # plt.show()
-    # print "we got a cr"
-    p, m = find_parallel_curve_3(c, 0.1, 50.0)
 
+    # ret = find_parallel(c, 0.1, 50.0)
+    #
+    # for cc in c:
     vlist = get_curve_points(c, 50.0)
     llist = V2L(vlist)
     plt.plot(llist[0], llist[1])
-
-    for cc in m:
-        vlist1 = get_curve_points(cc, 50.0)
-        llist1 = V2L(vlist1)
-        plt.plot(llist1[0], llist1[1])
-
-    for cc in p:
-        vlist2 = get_curve_points(cc, 50.0)
-        llist2 = V2L(vlist2)
-        plt.plot(llist2[0], llist2[1])
     plt.show()
-    # for curv in p:
-    #     for i in xrange(1, 101):
-    #         point = bezier_position(curv, i / 100.0)
-    #         pp = Point(point.x, point.y)
-    #         pp.setFill("blue")
-    #         pp.draw(win)
-    #         time.sleep(0.5)
     #
-    # win.show()
-    # for curv in m:
-    #     for i in xrange(1, 101):
-    #         point = bezier_position(curv, i / 100)
-    #         ps2.append([point.x, point.y])
-    # # plt.plot(ps2)
+    # for ccc in ret:
+    #     p = ccc[0]
+    #     m = ccc[0]
+    #
+    #     for cc in m:
+    #         vlist1 = get_curve_points(cc, 50.0)
+    #         llist1 = V2L(vlist1)
+    #         plt.plot(llist1[0], llist1[1])
+    #
+    #     for cc in p:
+    #         vlist2 = get_curve_points(cc, 50.0)
+    #         llist2 = V2L(vlist2)
+    #         plt.plot(llist2[0], llist2[1])
     # plt.show()
-    # curve = FitCurves.fitCurve(
-    #     array([array([0, 1]), array([1, 0]), array([2, 1]), array([1, 2]), array([0, 1])]), 0.001)
-
-    # # p = translate_to_curve(curve)
-    # c = Curve(Vector2D(0, 2), Vector2D(0, 0), Vector2D(2, 2), Vector2D(2, 0))
-    # c.set_linear()
-    #
-    # c0, c1 = split_by_parameters(c, Curve(), Curve(), 0.5)
-    # c = 0.551915024494
-    # p = [Curve(Vector2D(0, 1), Vector2D(c, 1), Vector2D(1, c), Vector2D(1, 0)),
-    #      Curve(Vector2D(1, 0), Vector2D(1, -c), Vector2D(c, -1), Vector2D(0, -1)),
-    #      Curve(Vector2D(0, -1), Vector2D(-c, -1), Vector2D(-1, -c), Vector2D(-1, 0)),
-    #      Curve(Vector2D(-1, 0), Vector2D(-1, c), Vector2D(-c, 1), Vector2D(0, 1))]
-    #
-    # for i, curve in enumerate(p):
-    #     cr = find_circle_in_curve(curve, res=0.01)
-    #     print "-------curve {}------".format(i + 1)
-    #     for c in cr:
-    #         print "t:{}: {}, {}".format(c[0], c[1][0], c[1][1])
-    # for i in xrange(1, 10):
-    #   p = bezier_position(curve, i / 10.0)
-    #   print curvature_by_t(curve, i / 10.0)
-
-    #       print get_length_by_time(c, 4)
-    # print "{}, {}".format(bezier_der(p[0], 0.5), bezier_der(p[2], 0.5))
-    # print "{}, {}".format(curvature_by_t(p[0], 0.5), curvature_by_t(p[2], 0.5))
-    # outp = find_circle_by_points(Vector2D(0, 0), Vector2D(1, 1), Vector2D(2, 0))
-    # print "{} {}".format(outp[0], outp[1])
 
 
 main()
