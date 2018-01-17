@@ -24,6 +24,7 @@ def fitCubic(points, leftTangent, rightTangent, error):
 
     # Parameterize points, and attempt to fit curve
     u = chordLengthParameterize(points)
+
     bezCurve = generateBezier(points, u, leftTangent, rightTangent)
     # Find max deviation of points to fitted curve
     maxError, splitPoint = computeMaxError(points, bezCurve, u)
@@ -55,8 +56,8 @@ def generateBezier(points, parameters, leftTangent, rightTangent):
     # compute the A's
     A = zeros((len(parameters), 2, 2))
     for i, u in enumerate(parameters):
-        A[i][0] = leftTangent  * 3*(1-u)**2 * u
-        A[i][1] = rightTangent * 3*(1-u)    * u**2
+        A[i][0] = leftTangent * 3*(1-u)**2 * u
+        A[i][1] = rightTangent * 3*(1-u) * u**2
 
     # Create the C and X matrices
     C = zeros((2, 2))
