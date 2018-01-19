@@ -1,5 +1,5 @@
 import FitCurves
-from numpy import *
+import numpy as np
 import matplotlib.pyplot as plt
 from VMath import *
 
@@ -313,11 +313,12 @@ def find_parallel(c, d, res):
     return ret
 
 def find_cubic_curve(p0, ang0, p1, ang1):
-    linear_dis = distance_points(p0, p1)
-    h0x = p0.x
-    h1x = p1.x
-    h0y = p1.y/2
-    h1y = p1.y/2
+    l = distance_points(p0, p1)
+
+    h0x = l/2 * cos(np.deg2rad(ang0)) + p0.x
+    h1x = l/2 * -cos(np.deg2rad(ang1)) + p1.x
+    h0y = l/2 * sin(np.deg2rad(ang0)) + p0.y
+    h1y = l/2 * -sin(np.deg2rad(ang1)) + p1.y
 
     return Curve(p0, Vector2D(h0x, h0y), Vector2D(h1x, h1y), p1)
 

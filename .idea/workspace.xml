@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1ae99aa0-f5dc-422a-a762-65108a82ec87" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/h.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/test.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FitCurves.py" afterPath="$PROJECT_DIR$/FitCurves.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/bezyea.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Bezier.py" afterPath="$PROJECT_DIR$/Bezier.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Bezier2D.py" afterPath="$PROJECT_DIR$/Bezier2D.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tes.py" afterPath="$PROJECT_DIR$/tes.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,8 +23,8 @@
       <file leaf-file-name="Bezier2D.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Bezier2D.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="310" column="44" lean-forward="true" selection-start-line="310" selection-start-column="44" selection-end-line="310" selection-end-column="44" />
+            <state relative-caret-position="58">
+              <caret line="260" column="4" lean-forward="true" selection-start-line="260" selection-start-column="4" selection-end-line="260" selection-end-column="4" />
               <folding>
                 <element signature="e#0#16#0" expanded="true" />
               </folding>
@@ -30,14 +32,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VMath.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/VMath.py">
+      <file leaf-file-name="bezyea.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/bezyea.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="79" column="16" lean-forward="false" selection-start-line="79" selection-start-column="16" selection-end-line="79" selection-end-column="16" />
-              <folding>
-                <element signature="e#0#16#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="291">
+              <caret line="29" column="53" lean-forward="true" selection-start-line="29" selection-start-column="53" selection-end-line="29" selection-end-column="53" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -45,8 +45,8 @@
       <file leaf-file-name="tes.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
-              <caret line="12" column="47" lean-forward="true" selection-start-line="12" selection-start-column="47" selection-end-line="12" selection-end-column="47" />
+            <state relative-caret-position="102">
+              <caret line="6" column="1" lean-forward="false" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -70,6 +70,7 @@
       <find>norma</find>
       <find>dis</find>
       <find>curve</find>
+      <find>par</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -84,6 +85,9 @@
         <option value="$PROJECT_DIR$/h.py" />
         <option value="$PROJECT_DIR$/VMath.py" />
         <option value="$PROJECT_DIR$/Bezier2D.py" />
+        <option value="$PROJECT_DIR$/Bezyea.py" />
+        <option value="$PROJECT_DIR$/Bezier.py" />
+        <option value="$PROJECT_DIR$/bezyea.py" />
         <option value="$PROJECT_DIR$/tes.py" />
       </list>
     </option>
@@ -156,20 +160,6 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="Unittests in tes.py" type="tests" factoryName="Unittests" temporary="true" nameIsGenerated="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="Bezier2D" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/tes.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
     </configuration>
     <configuration name="VMath" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -252,6 +242,23 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method />
     </configuration>
+    <configuration name="bezyea" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Bezier2D" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bezyea.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
     <configuration name="h" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -288,18 +295,18 @@
     </configuration>
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Python.h" />
-      <item index="1" class="java.lang.String" itemvalue="Python tests.Unittests in tes.py" />
-      <item index="2" class="java.lang.String" itemvalue="Python.tes" />
-      <item index="3" class="java.lang.String" itemvalue="Python.Bezier2D" />
-      <item index="4" class="java.lang.String" itemvalue="Python.VMath" />
+      <item index="1" class="java.lang.String" itemvalue="Python.tes" />
+      <item index="2" class="java.lang.String" itemvalue="Python.Bezier2D" />
+      <item index="3" class="java.lang.String" itemvalue="Python.VMath" />
+      <item index="4" class="java.lang.String" itemvalue="Python.bezyea" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.tes" />
-        <item index="1" class="java.lang.String" itemvalue="Python.VMath" />
-        <item index="2" class="java.lang.String" itemvalue="Python.Bezier2D" />
-        <item index="3" class="java.lang.String" itemvalue="Python.h" />
-        <item index="4" class="java.lang.String" itemvalue="Python tests.Unittests in tes.py" />
+        <item index="1" class="java.lang.String" itemvalue="Python.bezyea" />
+        <item index="2" class="java.lang.String" itemvalue="Python.VMath" />
+        <item index="3" class="java.lang.String" itemvalue="Python.Bezier2D" />
+        <item index="4" class="java.lang.String" itemvalue="Python.h" />
       </list>
     </recent_temporary>
   </component>
@@ -331,7 +338,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14787701" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32440946" sideWeight="0.5029412" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4532488" sideWeight="0.4970588" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2646593" sideWeight="0.4970588" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -372,9 +379,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
           <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#37#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -492,40 +497,48 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/VMath.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="82" column="112" lean-forward="true" selection-start-line="80" selection-start-column="4" selection-end-line="82" selection-end-column="112" />
+          <folding>
+            <element signature="e#0#16#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Bezier.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-29">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="204">
+          <caret line="12" column="0" lean-forward="true" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding>
-            <element signature="e#0#37#0" expanded="false" />
+            <element signature="e#15#36#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Bezier2D.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="310" column="44" lean-forward="true" selection-start-line="310" selection-start-column="44" selection-end-line="310" selection-end-column="44" />
+        <state relative-caret-position="58">
+          <caret line="260" column="4" lean-forward="true" selection-start-line="260" selection-start-column="4" selection-end-line="260" selection-end-column="4" />
           <folding>
             <element signature="e#0#16#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/VMath.py">
+    <entry file="file://$PROJECT_DIR$/bezyea.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="79" column="16" lean-forward="false" selection-start-line="79" selection-start-column="16" selection-end-line="79" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#16#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="291">
+          <caret line="29" column="53" lean-forward="true" selection-start-line="29" selection-start-column="53" selection-end-line="29" selection-end-column="53" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/tes.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="12" column="47" lean-forward="true" selection-start-line="12" selection-start-column="47" selection-end-line="12" selection-end-column="47" />
+        <state relative-caret-position="102">
+          <caret line="6" column="1" lean-forward="false" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
