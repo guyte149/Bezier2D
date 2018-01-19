@@ -4,9 +4,9 @@ from VMath import *
 from bezyea import CubicBezierCurves
 
 p0 = np.array([0, 0])
-ang0 = 90
+ang0 = 0
 p1 = np.array([1, 0])
-ang1 = 270
+ang1 = 0
 
 q = CubicBezierCurves.create_curve(p0, ang0, p1, ang1)
 # c = find_quardric_curve(Vector2D(0, 0), 70, Vector2D(1, 1), 20)
@@ -23,11 +23,11 @@ for i in xrange(0, 101):
     sec_der_point = q.second_bezier_derivative(i/100.0)
     x_list.append(curr_point[0])
     y_list.append(curr_point[1])
-    print '{} = {}   {}'.format('t', i/100.0, q.get_curvature(i / 100.0))
+    # print '{} = {}   {}'.format('t', i/100.0, q.get_curvature(i / 100.0))
     # x_list.append(derivative_point[0])
     # y_list.append(derivative_point[1])
     # x_list.append(sec_der_point[0])
     # y_list.append(sec_der_point[1])
-
+print q.get_equal_arcs(0.01)
 plt.plot(x_list, y_list)
 plt.show()

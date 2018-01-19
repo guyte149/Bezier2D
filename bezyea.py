@@ -31,6 +31,28 @@ class CubicBezierCurves(object):
 
         return (x_tag * y_tagai - y_tag*x_tagai) / np.power((x_tag*x_tag) + (y_tag*y_tag), 1.5)
 
+    def get_curve_Length(self):
+        l = 0
+        for t in xrange(0, 101):
+            if t/100.0 < 1:
+                p1 = self(t/100.0)
+                p2 = self(t/100.0 + 0.01)
+                l += np.linalg.norm(p2 - p1)
+        return l
+
+    def get_equal_arcs(self, arc_length):
+        p0 = self(0)
+        t = 0
+        list = [p0]
+        for i in xrange(0, 1001):
+            p1 = self(t + i/1000)
+            if np.linalg.norm(p1 - p0) >= arc_length:
+                list.append(p1)
+                p0 = p1
+                t = t + i
+        return list
+
+
     def find_parallel(self, t, width):
         der_x = self.bezier_derivative(t)[0]
         der_y = self.bezier_derivative(t)[1]
@@ -51,4 +73,4 @@ class CubicBezierCurves(object):
 
 
     def __str__(self):
-        return "P0 = %s\nC0 = %s\nC1 = %sP1 = %s" % (self.p0, self.c0, self.c1, self.p1)
+        return 'p0- {} \nc0- {} \nc1- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.p1, self.get_curve_Length())
