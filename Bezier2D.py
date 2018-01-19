@@ -1,7 +1,17 @@
 import FitCurves
-from numpy import *
+import numpy as np
 import matplotlib.pyplot as plt
 from VMath import *
+
+
+class QuadricCurve:
+    def __init__(self, p0, h0, p1):
+        self.p0 = p0
+        self.h0 = h0
+        self.p1 = p1
+
+    def __str__(self):
+        return "p0: {}, h0: {}, p1: {}".format(self.p0, self.h0, self.p1)
 
 
 class Curve:
@@ -300,6 +310,28 @@ def find_parallel(c, d, res):
         p, m = find_parallel_curve_3(cc, d, res)
         ret.append([p, m])
     return ret
+
+def find_cubic_curve(p0, ang0, p1, ang1):
+    l = distance_points(p0, p1)
+
+    h0x = l/2 * cos(np.deg2rad(ang0)) + p0.x
+    h1x = l/2 * -cos(np.deg2rad(ang1)) + p1.x
+    h0y = l/2 * sin(np.deg2rad(ang0)) + p0.y
+    h1y = l/2 * -sin(np.deg2rad(ang1)) + p1.y
+
+    return Curve(p0, Vector2D(h0x, h0y), Vector2D(h1x, h1y), p1)
+
+
+def find_quardric_curve(p0, ang0, p1, ang1):
+    linear_dis = distance_points(p0, p1)
+    p0slope = tan(radians(ang0))
+    p1slope = tan(radians(ang1))
+    bp0 = -(p0slope * p0.x) + p0.y
+    bp1 = -(p1slope * p1.x) + p1.y
+    x = (bp1-bp0)/(p0slope-p1slope)
+    y = p0slope*x+bp0
+
+    return QuadricCurve(p0, Vector2D(x, y), p1)
 
 
 def main():

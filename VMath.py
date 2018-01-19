@@ -72,6 +72,11 @@ class LinearEquation:
                     Vector2D(x2, (self.m * x2) - (self.m * self.p.x) + self.p.y)]
 
 
+def quadric_position(c, t):
+    omt = 1-t
+    return (c.p0 * omt * omt) + (c.h0 * 2 * omt * t) + (c.p1 * t * t)
+
+
 def bezier_position(c, t):
     t = float(t)
     omt = 1 - t
@@ -160,4 +165,3 @@ def distance_line(p, ps, pe):
 
 def turn_90_degrees(v):
     return Vector2D(v.y, -v.x)
-
