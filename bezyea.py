@@ -41,14 +41,17 @@ class CubicBezierCurves(object):
 
     def get_equal_arcs(self, arc_length):
         p0 = self(0)
+        # print p0
         t = 0
         lst = [p0]
-        for i in xrange(0, 1001):
-            p1 = self(t + i/1000)
+        for i in xrange(0, 100001):
+            # print i
+            p1 = self(t + i/100000.0)
+            # print np.linalg.norm(p1-p0) >= arc_length
             if np.linalg.norm(p1 - p0) >= arc_length:
                 lst.append(p1)
                 p0 = p1
-                t = t + i
+                t = t + (i/100000.0)
         return lst
 
     def find_parallel(self, t, width):
