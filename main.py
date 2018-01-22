@@ -4,7 +4,7 @@ from bezyea import *
 p0 = np.array([0, 0])
 ang0 = 90
 p1 = np.array([1, 1])
-ang1 = 0
+ang1 = 90
 
 q = CubicBezierCurves.create_curve(p0, ang0, p1, ang1)
 print q
@@ -16,7 +16,8 @@ x_list = []
 #     y_list.append(q(t/1000.0)[1])
 ls = q.get_equal_arcs(0.01)
 for p in ls:
+    # print p
     x_list.append(p[0])
     y_list.append(p[1])
-plt.plot(x_list, y_list, 'ro')
+plt.plot(x_list, y_list)
 plt.show()

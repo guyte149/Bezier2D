@@ -44,14 +44,16 @@ class CubicBezierCurves(object):
         # print p0
         t = 0
         lst = [p0]
-        for i in xrange(0, 100001):
+        for i in xrange(0, 1000001):
             # print i
-            p1 = self(t + i/100000.0)
-            # print np.linalg.norm(p1-p0) >= arc_length
+            p1 = self(i/1000000.0)
+            # print '{}  -  {}'.format(p1, np.linalg.norm(p1-p0) >= arc_length)
+            # print np.linalg.norm(p1-p0)
+            # print i/10000000.0
             if np.linalg.norm(p1 - p0) >= arc_length:
                 lst.append(p1)
                 p0 = p1
-                t = t + (i/100000.0)
+                t = (i/1000000.0)
         return lst
 
     def find_parallel(self, t, width):
