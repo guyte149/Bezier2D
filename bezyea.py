@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class CubicBezierCurves(object):
+class CubicBezierCurve(object):
 
     def __init__(self, p0, c0, c1, p1):
         self.p0 = p0
@@ -16,11 +16,11 @@ class CubicBezierCurves(object):
 
     def bezier_derivative(self, t):
         omt = 1 - t
-        return 3 * omt * omt * (self.c0 - self.p0) + 6 * omt * t * (self.c1 - self.c0) + 3 * t * t * t * (self.p1 - self.c1)
+        return 3 * omt * omt * (self.c0 - self.p0) + 6 * omt * t * (self.c1 - self.c0) + 3 * t * t * (self.p1 - self.c1)
 
     def second_bezier_derivative(self, t):
         omt = 1-t
-        return 6 * omt * (self.c1 - (2 * self.c0) + self.p0) + 6 * t * (self.p1 - (2 * self.c1) + self.c1)
+        return 6 * omt * (self.c1 - (2 * self.c0) + self.p0) + 6 * t * (self.p1 - (2 * self.c1) + self.c0)
 
     def get_curvature(self, t):
         x_tag = self.bezier_derivative(t)[0]
@@ -30,12 +30,12 @@ class CubicBezierCurves(object):
 
         return (x_tag * y_tagai - y_tag*x_tagai) / np.power((x_tag*x_tag) + (y_tag*y_tag), 1.5)
 
-    def get_curve_length(self):
+    def get_curve_length(self, res=1000.0):
         l = 0
-        for t in xrange(0, 101):
-            if t/100.0 < 1:
-                p1 = self(t/100.0)
-                p2 = self(t/100.0 + 0.01)
+        for t in xrange(0, int(res+1)):
+            if t/res < 1:
+                p1 = self(t/res)
+                p2 = self((t/res) + (1/res))
                 l += np.linalg.norm(p2 - p1)
         return l
 
@@ -44,16 +44,12 @@ class CubicBezierCurves(object):
         # print p0
         t = 0
         lst = [p0]
-        for i in xrange(0, 1000001):
+        for i in xrange(0, 100001):
             # print i
-            p1 = self(i/1000000.0)
-            # print '{}  -  {}'.format(p1, np.linalg.norm(p1-p0) >= arc_length)
-            # print np.linalg.norm(p1-p0)
-            # print i/10000000.0
+            p1 = self(i/100000.0)
             if np.linalg.norm(p1 - p0) >= arc_length:
                 lst.append(p1)
                 p0 = p1
-                t = (i/1000000.0)
         return lst
 
     def find_parallel(self, t, width):
@@ -72,7 +68,22 @@ class CubicBezierCurves(object):
         c0 = p0 + u * v0
         c1 = p1 - u * v1
 
-        return CubicBezierCurves(p0, c0, c1, p1)
+        return CubicBezierCurve(p0, c0, c1, p1)
 
     def __str__(self):
         return 'p0- {} \nc0- {} \nc1- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.p1, self.get_curve_length())
+
+
+class BezierPath:
+
+    def __init__(self, *curves):
+        self.curves = curves
+
+    def insert_curve(self, c):
+        self.curves.append(c)
+
+    # first argument is t, second argument is curve segment
+    def __call__(self, *args, **kwargs):
+        t = args[0]
+        seg = args[1]
+        return self.curves[seg](t)
