@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class CubicBezierCurve(object):
@@ -13,6 +14,16 @@ class CubicBezierCurve(object):
         t = args[0]
         omt = 1 - t
         return (self.p0 * omt * omt * omt) + (self.c0 * 3 * omt * omt * t) + (self.c1 * 3 * omt * t * t) + (self.p1 * t * t * t)
+
+    def draw_curve(self, res=1000.0):
+        x_list = []
+        y_list = []
+        for t in xrange(0, int(res+1)):
+            x_list.append(self(t / res)[0])
+            y_list.append(self(t / res)[1])
+            print 't={},  R={}'.format(t / res, 1 / self.get_curvature(t / res))
+        plt.plot(x_list, y_list)
+        plt.show()
 
     def bezier_derivative(self, t):
         omt = 1 - t
@@ -87,3 +98,6 @@ class BezierPath:
         t = args[0]
         seg = args[1]
         return self.curves[seg](t)
+
+    def __str__(self):
+        return self.curves
