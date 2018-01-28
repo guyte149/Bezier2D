@@ -41,6 +41,13 @@ class CubicBezierCurve(object):
 
         return (x_tag * y_tagai - y_tag*x_tagai) / np.power((x_tag*x_tag) + (y_tag*y_tag), 1.5)
 
+    def get_angle(self, t):
+        der = self.bezier_derivative(t)
+        x_tag = der[0]
+        y_tag = der[1]
+        r = y_tag/x_tag
+        return np.arctan(r/180*np.pi)
+
     def get_curve_length(self, res=1000.0):
         l = 0
         for t in xrange(0, int(res+1)):
@@ -54,12 +61,11 @@ class CubicBezierCurve(object):
         p0 = self(0)
         # print p0
         t = 0
-        lst = [p0]
+        lst = [(p0, 0)]
         for i in xrange(0, 100001):
-            # print i
             p1 = self(i/100000.0)
             if np.linalg.norm(p1 - p0) >= arc_length:
-                lst.append(p1)
+                lst.append((p1, i/100000.0))
                 p0 = p1
         return lst
 
@@ -89,15 +95,31 @@ class BezierPath:
 
     def __init__(self, *curves):
         self.curves = curves
+        self.max_v = 2
+        self.max_a = 2
 
     def insert_curve(self, c):
         self.curves.append(c)
 
-    # first argument is t, second argument is curve segment
+    # first argument is t, second argument is curve number
     def __call__(self, *args, **kwargs):
         t = args[0]
         seg = args[1]
-        return self.curves[seg](t)
+        # print 'seg={}   curves seg - {}'.format(seg, self.curves[seg])
+        return self.curves[0][seg](t)
+
+    def draw_path(self, res=1000.0):
+        x_list = []
+        y_list = []
+        for s in xrange(0, len(self.curves[0])):
+            for t in xrange(0, int(res + 1)):
+                x_list.append(self(t / res, s)[0])
+                y_list.append(self(t / res, s)[1])
+                # print 't={},  R={}'.format(t / res, 1 / self.get_curvature(t / res))
+        plt.plot(x_list, y_list)
+        plt.show()
+
+    # def get_equal_arcs(self):
 
     def __str__(self):
         return self.curves

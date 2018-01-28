@@ -1,10 +1,10 @@
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from bezyea import *
 
 p0 = np.array([0, 0])
 ang0 = 90
-p1 = np.array([1, 1])
-ang1 = 90
+p1 = np.array([1, 0])
+ang1 = 270
 
 q = CubicBezierCurve.create_curve(p0, ang0, p1, ang1)
 print q
@@ -14,7 +14,8 @@ x_list = []
 for t in xrange(0, 1001):
     x_list.append(q(t/1000.0)[0])
     y_list.append(q(t/1000.0)[1])
-    print 't={},  R={}'.format(t/1000.0, 1/q.get_curvature(t/1000.0))
+    # print 't={},  R={}'.format(t/1000.0, 1/q.get_curvature(t/1000.0))
+    print q.get_angle(t/1000.0)
 # ls = q.get_equal_arcs(0.001)
 # print len(ls)
 # for p in ls:
