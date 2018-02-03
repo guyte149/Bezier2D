@@ -1,20 +1,43 @@
 import numpy as np
+import re
 from bezyea import *
+
 
 curves = []
 # path = BezierPath()
-s = input("how many curves?")
-for i in xrange(0, s):
-    p0x = input("p0x:")
-    p0y = input("p0y:")
-    p0 = np.array([p0x, p0y])
-    ang0 = input("angle 0:")
-    p1x = input("p1x:")
-    p1y = input("p1y:")
-    p1 = np.array([p1x, p1y])
-    ang1 = input("angle 1:")
+
+waypoints = []
+
+print("[-] Please enter the waypoint of the path in the following format: [x], [y], [deg_angle] :  \n")
+while True:
+    inp = raw_input("> ")
+
+    inp = str(inp)
+    matches = re.search('''(\S+)\s?,\s?(\S+)\s?,\s?(\S+)''', inp)
+
+    if matches is None:
+        break
+
+    x = float(matches.group(1))
+    y = float(matches.group(2))
+    ang = float(matches.group(3))
+    waypoints.append((np.array([x, y]), ang))
+
+for i in xrange(len(waypoints) - 1):
+    p0 = waypoints[i][0]
+    ang0 = waypoints[i][1]
+    p1 = waypoints[i + 1][0]
+    ang1 = waypoints[i + 1][1]
+
     curves.append(CubicBezierCurve.create_curve(p0, ang0, p1, ang1))
 
-path = BezierPath(curves)
-path.draw_path()
+print("\n[-] Done! Calculating trajectory...")
 
+path = BezierPath(curves)
+trajectory = Trajectory(path)
+trajectory.build_trajectory()
+
+for s in trajectory.setpoints:
+    print s
+
+path.draw_path()
