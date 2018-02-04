@@ -1,6 +1,7 @@
 import numpy as np
 import re
 from bezyea import *
+import matplotlib.pyplot as plt
 
 
 curves = []
@@ -35,9 +36,11 @@ print("\n[-] Done! Calculating trajectory...")
 
 path = BezierPath(curves)
 trajectory = Trajectory(path)
-trajectory.build_trajectory()
+trajectory.build_trajectory(0.6, 2, 1)
 
 for s in trajectory.setpoints:
     print s
 
-path.draw_path()
+plt.plot([s.p for s in trajectory.setpoints], [s.v for s in trajectory.setpoints])
+plt.show()
+# path.draw_path()
