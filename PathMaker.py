@@ -36,7 +36,7 @@ print("\n[-] Done! Calculating trajectory...")
 
 path = BezierPath(curves)
 trajectory = Trajectory(path)
-trajectory.build_trajectory(0.6, 2, 1)
+trajectory.build_trajectory(0.67, 2.18, 1)
 
 for s in trajectory.setpoints:
     print s

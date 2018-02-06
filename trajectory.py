@@ -1,6 +1,7 @@
 import numpy as np
 import warnings
 
+
 class Trajectory(object):
     def __init__(self, path):
         self.path = path
@@ -9,6 +10,7 @@ class Trajectory(object):
     def build_trajectory(self, width, max_v, max_a):
 
         self.setpoints = self.path.get_setpoints()
+        self.fix_curvatures()
         # manually set the first setpoint
         self.setpoints[0].v = 0
         self.setpoints[0].h = 0
@@ -30,11 +32,25 @@ class Trajectory(object):
                 self.setpoints[i].a = 0
             else:
                 self.setpoints[i].v = min(isolated_max_v, kinematic_v)
-                if self.setpoints[i] == kinematic_v:
+                if self.setpoints[i].v == kinematic_v:
                     self.setpoints[i].a = max_a
                 else:
                     self.setpoints[i].a = 999999999999
-        # for i in xrange(len(self.setpoints - 1), 1)
+        self.setpoints[-2].v = 0
+        for i in xrange(len(self.setpoints) - 3, 0, -1):
+            kinematic_v = np.sqrt(np.power(self.setpoints[i+1].v, 2) + (2 * -max_a * (self.setpoints[i].p - self.setpoints[i+1].p)))
+            self.setpoints[i].v = min(kinematic_v, self.setpoints[i].v)
+            if self.setpoints[i].v == kinematic_v:
+                self.setpoints[i].a = -max_a
+            if self.setpoints[i + 1].v < self.setpoints[i].v < kinematic_v:
+                self.setpoints[i].a = 0
+
+    def fix_curvatures(self):
+        last_curvature = 0
+        for s in self.setpoints:
+            if not isinstance(s.curvature, float):
+                s.curvature = last_curvature
+            last_curvature = s.curvature
 
 
 class Setpoint(object):
