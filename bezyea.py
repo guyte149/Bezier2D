@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import *
 from trajectory import *
+from progress.bar import Bar
 
 
 class CubicBezierCurve(object):
@@ -76,8 +77,13 @@ class CubicBezierCurve(object):
         last_p = p0.copy()
         # initialize the first point
         setpoints = [Setpoint(point=p0, p=start_poistion, curvature=self.get_curvature(0), heading=self.get_angle(0))]
-
+        # bar = Bar('processing', max=10)
+        # print "bar on"
         for i in np.arange(0, 1, step):
+            # if(i%)
+            # bar.next()
+
+
             p1 = self(i)
             norm = np.linalg.norm(p1 - last_p)
             curr_arc += norm
@@ -97,7 +103,7 @@ class CubicBezierCurve(object):
                 curr_arc = 0
 
             last_p = p1
-
+        # bar.finish()
         # add the last point
         setpoints.append(Setpoint(point=self(1), p=start_poistion + self.get_curve_length(), curvature=self(1),
                                   heading=self.get_angle(1)))

@@ -41,6 +41,7 @@ trajectory.build_trajectory(0.67, 2.18, 1)
 for s in trajectory.setpoints:
     print s
 
-plt.plot([s.p for s in trajectory.setpoints], [s.v for s in trajectory.setpoints])
-plt.show()
+# plt.plot([s.p for s in trajectory.setpoints], [s.v for s in trajectory.setpoints])
+# plt.show()
 # path.draw_path()
+trajectory.draw_trajectory()

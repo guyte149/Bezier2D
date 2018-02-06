@@ -1,5 +1,8 @@
+from operator import pos
+
 import numpy as np
 import warnings
+import matplotlib.pyplot as plt
 
 
 class Trajectory(object):
@@ -51,6 +54,28 @@ class Trajectory(object):
             if not isinstance(s.curvature, float):
                 s.curvature = last_curvature
             last_curvature = s.curvature
+
+    def draw_trajectory(self):
+        x_list = []
+        y_list = []
+        velocities = []
+        positions = []
+        for s in self.setpoints:
+            x_list.append(s.point[0])
+            y_list.append(s.point[1])
+            velocities.append(s.v)
+            positions.append(s.p)
+            # print 't={},  R={}'.format(t / res, 1 / self.get_curvature(t / res))
+
+        # plt.axes().set_aspect('equal', 'datalim')
+        plt.subplot(2, 1, 1)
+        plt.plot(x_list, y_list)
+        plt.title("trajectory")
+        plt.subplot(2, 1, 2)
+        plt.plot(positions, velocities)
+        plt.ylabel("velocity")
+        plt.xlabel("distance")
+        plt.show()
 
 
 class Setpoint(object):
