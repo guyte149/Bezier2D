@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import *
 from trajectory import *
+from progress.bar import Bar
 
 
 class CubicBezierCurve(object):
@@ -64,20 +65,26 @@ class CubicBezierCurve(object):
                 l += np.linalg.norm(p2 - p1)
         return l
 
-    def get_setpoints(self, arc_length, start_poistion=0, step=0.000001):
+    def get_setpoints(self, arc_length, start_poistion=0, step=0.00001):
         """
         return a list of Setpoints, one arc_length apart from each other
         :param arc_length:
         :return:
         """
         p0 = self(0)
+        last_curvature = 0
         position = start_poistion
         curr_arc = 0
         last_p = p0.copy()
         # initialize the first point
         setpoints = [Setpoint(point=p0, p=start_poistion, curvature=self.get_curvature(0), heading=self.get_angle(0))]
-
+        # bar = Bar('processing', max=10)
+        # print "bar on"
         for i in np.arange(0, 1, step):
+            # if(i%)
+            # bar.next()
+
+
             p1 = self(i)
             norm = np.linalg.norm(p1 - last_p)
             curr_arc += norm
@@ -88,7 +95,6 @@ class CubicBezierCurve(object):
                 if abs(arc_length - curr_arc) > abs(arc_length - (curr_arc - norm)):
                     p1 = last_p.copy()
                     position -= norm
-
                 # we found the closest point, move to search for the next one...
                 setpoints.append(
                     Setpoint(point=p1, p=position, curvature=self.get_curvature(i), heading=self.get_angle(i)))
@@ -97,9 +103,9 @@ class CubicBezierCurve(object):
                 curr_arc = 0
 
             last_p = p1
-
+        # bar.finish()
         # add the last point
-        setpoints.append(Setpoint(point=self(1), p=start_poistion + self.get_curve_length(), curvature=self(1),
+        setpoints.append(Setpoint(point=self(1), p=start_poistion + self.get_curve_length(), curvature=setpoints[-1].curvature,
                                   heading=self.get_angle(1)))
         return setpoints
 
