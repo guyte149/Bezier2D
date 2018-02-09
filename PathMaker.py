@@ -3,9 +3,7 @@ import re
 from bezyea import *
 import matplotlib.pyplot as plt
 
-
 curves = []
-# path = BezierPath()
 
 waypoints = []
 
@@ -24,6 +22,9 @@ while True:
     ang = float(matches.group(3))
     waypoints.append((np.array([x, y]), ang))
 
+# angle at the first point is always 90 deg
+waypoints[0] = (waypoints[0][0], 90)
+
 for i in xrange(len(waypoints) - 1):
     p0 = waypoints[i][0]
     ang0 = waypoints[i][1]
@@ -36,8 +37,8 @@ print("\n[-] Done! Calculating trajectory...")
 
 path = BezierPath(curves)
 trajectory = Trajectory(path)
-trajectory.build_trajectory(0.67, 2.18, 1)
-
+# trajectory.build_center_trajectory(0.67, 1, 1)
+trajectory.build_trajectory(0.67, 2.18, 1.5)
 for s in trajectory.setpoints:
     print s
 
