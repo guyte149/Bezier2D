@@ -2,6 +2,7 @@ import numpy as np
 import re
 from bezyea import *
 import matplotlib.pyplot as plt
+from file_writer import File_Writer
 
 curves = []
 
@@ -40,6 +41,8 @@ trajectory = Trajectory(path)
 
 # trajectory.build_center_trajectory(0.67, 1, 1)
 trajectory.build_trajectory(0.67, 2.18, 1.5)
-for s in trajectory.left_trajectory:
-    print s
+# for s in trajectory.left_trajectory:
+#     print s
+fw = File_Writer(trajectory)
+fw.write()
 trajectory.draw_trajectory()

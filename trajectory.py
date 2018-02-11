@@ -137,8 +137,7 @@ class Trajectory(object):
         plt.ylabel("velocity")
         plt.xlabel("time")
         plt.show()
-        
-    @staticmethod
+
     def get_normal_points(self, point, width, heading):
         angle = 90 - heading
         vl = width * 0.5 * np.array([np.cos(np.deg2rad(angle + 90)), np.sin(np.deg2rad(angle + 90))])
