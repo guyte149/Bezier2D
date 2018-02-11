@@ -66,7 +66,6 @@ class Trajectory(object):
         time = 0
         right_pos = 0
         left_pos = 0
-        # right, left = self.get_normal_points(self.setpoints[0].point, width, self.setpoints[0].heading)
         right_trajectory[0].point, left_trajectory[0].point = self.get_normal_points(self.setpoints[0].point, width,
                                                                                      self.setpoints[0].heading)
         right_trajectory[0] = Setpoint(p=0, v=0)
@@ -77,11 +76,15 @@ class Trajectory(object):
             right_trajectory[i].point, left_trajectory[i].point = self.get_normal_points(self.setpoints[i].point, width,
                                                                                          self.setpoints[i].heading)
             # calculate the positions for both sides
-            right_trajectory[i].p = right_pos + np.linalg.norm(
+            right_trajectory[i].p = right_trajectory[i - 1].p + np.linalg.norm(
                 right_trajectory[i].point - right_trajectory[i - 1].point)
-            left_trajectory[i].p = left_pos + np.linalg.norm(left_trajectory[i].point - left_trajectory[i - 1].point)
-            right_pos += right_trajectory[i].p
-            left_pos += left_trajectory[i].p
+            left_trajectory[i].p = left_trajectory[i - 1].p + np.linalg.norm(
+                left_trajectory[i].point - left_trajectory[i - 1].point)
+
+            # print "dx = {}".format(np.linalg.norm(left_trajectory[i].point - left_trajectory[i - 1].point))
+
+            right_pos = right_pos + right_trajectory[i].p
+            left_pos = left_pos + left_trajectory[i].p
 
             is_right_turn = self.setpoints[i].curvature <= 0
 
@@ -100,15 +103,12 @@ class Trajectory(object):
                 left_trajectory[i].v = small_v
 
             # calculate the time at the current setpoint
-            # print self.setpoints[i - 1].p, self.setpoints[i].p
             dx = self.setpoints[i - 1].p - self.setpoints[i].p
             roots = np.roots([0.5 * self.setpoints[i].a, self.setpoints[i].v, dx])
-            # print "len = {}, i = {}, "
-            # print "len = {}, a = {}, v = {} , dx = {}".format(len(roots), self.setpoints[i].a, self.setpoints[i].v, dx)
-            # print "roots = {}, a = {}, v = {}, dx = {}".format(roots, self.setpoints[i].a, self.setpoints[i].v, dx)
             if len(roots[roots > 0]) < 1:
                 dt = 0
-            elif np.min
+            elif not np.isreal(np.min(roots[roots > 0])):
+                dt = 0
             else:
                 dt = np.min(roots[roots > 0])
             time += dt
@@ -124,21 +124,6 @@ class Trajectory(object):
         self.left_trajectory = left_trajectory
 
     def draw_trajectory(self):
-        x_list = []
-        y_list = []
-        right_x = []
-        right_y = []
-        left_x = []
-        left_y = []
-        velocities = []
-        positions = []
-        # for i in xrange(0, len(self.setpoints):
-        #     x_list.append(self.setpoints[i].point[0])
-        #     y_list.append(self.setpoints[i].point[1])
-        #     velocities.append(self.setpoints)
-        #     positions.append(s.p)
-        # print 't={},  R={}'.format(t / res, 1 / self.get_curvature(t / res))
-
         # plt.axes().set_aspect('equal', 'datalim')
         plt.subplot(2, 1, 1)
         plt.plot([s.point[0] for s in self.setpoints], [s.point[1] for s in self.setpoints],
@@ -152,14 +137,16 @@ class Trajectory(object):
         plt.ylabel("velocity")
         plt.xlabel("time")
         plt.show()
-
+        
+    @staticmethod
     def get_normal_points(self, point, width, heading):
         angle = 90 - heading
-        v = width * 0.5 * np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
-        rotation_mat = np.array([[0, 1],
-                                 [-1, 0]])
-        right_point = point + (v * rotation_mat)
-        left_point = point + (-v * rotation_mat)
+        vl = width * 0.5 * np.array([np.cos(np.deg2rad(angle + 90)), np.sin(np.deg2rad(angle + 90))])
+        vr = width * 0.5 * np.array([np.cos(np.deg2rad(angle - 90)), np.sin(np.deg2rad(angle - 90))])
+        # print v
+
+        right_point = point + vr
+        left_point = point + vl
         return right_point, left_point
 
 
