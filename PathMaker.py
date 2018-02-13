@@ -8,6 +8,9 @@ curves = []
 
 waypoints = []
 
+name = raw_input("Please pick a name for the file: ")
+
+
 print("[-] Please enter the waypoint of the path in the following format: [x], [y], [deg_angle] :  \n")
 while True:
     inp = raw_input("> ")
@@ -41,8 +44,8 @@ trajectory = Trajectory(path)
 
 # trajectory.build_center_trajectory(0.67, 1, 1)
 trajectory.build_trajectory(0.67, 2.18, 1.5)
-# for s in trajectory.left_trajectory:
-#     print s
-fw = File_Writer(trajectory)
+for s in trajectory.left_trajectory:
+    print s
+fw = File_Writer(trajectory, name)
 fw.write()
 trajectory.draw_trajectory()

@@ -120,6 +120,13 @@ class Trajectory(object):
             right_trajectory[i - 1].a = (right_trajectory[i].v - right_trajectory[i - 1].v) / dt
             left_trajectory[i - 1].a = (left_trajectory[i].v - left_trajectory[i - 1].v) / dt
 
+        right_trajectory[-1].a = 0
+        right_trajectory[-2].a = 0
+        right_trajectory[-3].a = 0
+        left_trajectory[-1].a = 0
+        left_trajectory[-2].a = 0
+        left_trajectory[-3].a = 0
+
         self.right_trajectory = right_trajectory
         self.left_trajectory = left_trajectory
 
