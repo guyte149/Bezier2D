@@ -66,10 +66,10 @@ class Trajectory(object):
         time = 0
         right_pos = 0
         left_pos = 0
-        right_trajectory[0].point, left_trajectory[0].point = self.get_normal_points(self.setpoints[0].point, width,
-                                                                                     self.setpoints[0].heading)
         right_trajectory[0] = Setpoint(p=0, v=0)
         left_trajectory[0] = Setpoint(p=0, v=0)
+        right_trajectory[0].point, left_trajectory[0].point = self.get_normal_points(self.setpoints[0].point, width,
+                                                                                     self.setpoints[0].heading)
         for i in xrange(1, len(self.setpoints)):
 
             # calculate the points of the right and the left sides
@@ -106,12 +106,13 @@ class Trajectory(object):
             dx = self.setpoints[i - 1].p - self.setpoints[i].p
             roots = np.roots([0.5 * self.setpoints[i].a, self.setpoints[i].v, dx])
             if len(roots[roots > 0]) < 1:
-                dt = 0
+                dt = 0.01
             elif not np.isreal(np.min(roots[roots > 0])):
-                dt = 0
+                dt = 0.01
             else:
                 dt = np.min(roots[roots > 0])
             time += dt
+            print dt
 
             self.setpoints[i].time = time
             right_trajectory[i].time = time
@@ -120,9 +121,11 @@ class Trajectory(object):
             right_trajectory[i - 1].a = (right_trajectory[i].v - right_trajectory[i - 1].v) / dt
             left_trajectory[i - 1].a = (left_trajectory[i].v - left_trajectory[i - 1].v) / dt
 
+        right_trajectory[0].a = 0
         right_trajectory[-1].a = 0
         right_trajectory[-2].a = 0
         right_trajectory[-3].a = 0
+        left_trajectory[0].a = 0
         left_trajectory[-1].a = 0
         left_trajectory[-2].a = 0
         left_trajectory[-3].a = 0

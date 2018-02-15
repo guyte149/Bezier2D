@@ -12,12 +12,20 @@ class File_Writer:
         data_left = [s for s in self.trajectory.left_trajectory]
         os.chdir(r"C:\Users\Guy\Documents\robotica\Paths")
         with open(self.name + '_right.csv', 'wb') as file:
+            file.write("Time" + ",")
+            file.write("Position" + ",")
+            file.write("Velocity" + ",")
+            file.write("Acceleration" + "\n")
             for x in range(0, data_right.__len__()):
                 file.write(str(data_right[x].time) + ",")
                 file.write(str(data_right[x].p) + ",")
                 file.write(str(data_right[x].v) + ",")
                 file.write(str(data_right[x].a) + "\n")
         with open(self.name + '_left.csv', 'wb') as file:
+            file.write("Time" + ",")
+            file.write("Position" + ",")
+            file.write("Velocity" + ",")
+            file.write("Acceleration" + "\n")
             for x in range(0, data_left.__len__()):
                 file.write(str(data_left[x].time) + ",")
                 file.write(str(data_left[x].p) + ",")
