@@ -112,7 +112,7 @@ class Trajectory(object):
             else:
                 dt = np.min(roots[roots > 0])
             time += dt
-            print dt
+            # print dt
 
             self.setpoints[i].time = time
             right_trajectory[i].time = time
@@ -157,6 +157,33 @@ class Trajectory(object):
         right_point = point + vr
         left_point = point + vl
         return right_point, left_point
+
+    @staticmethod
+    def trajectory_slice_constant_dt(trajectory, dt=0.01):
+
+        updated_right_trajectory = [trajectory.right_trajectory[0]]
+        updated_left_trajectory = [trajectory.left_trajectory[0]]
+        i = 0
+        for t in np.arange(dt, trajectory.right_trajectory[-1].time, dt):
+            j = 0
+            while not trajectory.right_trajectory[i + j].time < t < trajectory.right_trajectory[i + j + 1].time:
+                j += 1
+                if trajectory.right_trajectory[i + j].time == t:
+                    break
+
+            if abs(trajectory.right_trajectory[i + j].time - t) > abs(trajectory.right_trajectory[i + j + 1].time - t):
+                updated_right_trajectory.append(trajectory.right_trajectory[i + j + 1])
+                updated_left_trajectory.append(trajectory.left_trajectory[i + j + 1])
+                print updated_right_trajectory[-1].time
+            else:
+                updated_right_trajectory.append(trajectory.right_trajectory[i + j])
+                updated_left_trajectory.append(trajectory.left_trajectory[i + j])
+                print updated_right_trajectory[-1].time
+
+            i = i + j
+        updated_left_trajectory.append(trajectory.left_trajectory[-1])
+        updated_right_trajectory.append(trajectory.right_trajectory[-1])
+        return updated_left_trajectory, updated_right_trajectory
 
 
 class Setpoint(object):

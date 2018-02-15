@@ -16,7 +16,7 @@ class CubicBezierCurve(object):
         t = args[0]
         omt = 1 - t
         return (self.p0 * omt * omt * omt) + (self.c0 * 3 * omt * omt * t) + (self.c1 * 3 * omt * t * t) + (
-        self.p1 * t * t * t)
+            self.p1 * t * t * t)
 
     def draw_curve(self, res=1000.0):
         x_list = []
@@ -66,7 +66,7 @@ class CubicBezierCurve(object):
                 l += np.linalg.norm(p2 - p1)
         return l
 
-    def get_setpoints(self, arc_length, start_poistion=0, step=0.00001):
+    def get_setpoints(self, arc_length, start_poistion=0, step=0.0000025):
         """
         return a list of Setpoints, one arc_length apart from each other
         :param arc_length:
@@ -106,8 +106,9 @@ class CubicBezierCurve(object):
             last_p = p1
         # bar.finish()
         # add the last point
-        setpoints.append(Setpoint(point=self(1), p=start_poistion + self.get_curve_length(), curvature=setpoints[-1].curvature,
-                                  heading=self.get_angle(1)))
+        setpoints.append(
+            Setpoint(point=self(1), p=start_poistion + self.get_curve_length(), curvature=setpoints[-1].curvature,
+                     heading=self.get_angle(1)))
         return setpoints
 
     def find_parallel(self, t, width):
@@ -162,7 +163,7 @@ class BezierPath(object):
     def get_angle(self, t, seg):
         return self.curves[0][seg].get_angle(t)
 
-    def get_setpoints(self, arc_length=0.001):
+    def get_setpoints(self, arc_length=0.00005):
         l = []
         start_position = 0
         for c in self.curves[0]:

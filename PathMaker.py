@@ -44,8 +44,10 @@ trajectory = Trajectory(path)
 
 # trajectory.build_center_trajectory(0.67, 1, 1)
 trajectory.build_trajectory(0.67, 1.6, 1)
+print len(trajectory.right_trajectory)
 # for s in trajectory.left_trajectory:
 #     print s
-fw = File_Writer(trajectory, path_name)
+right_trajectory_sliced, left_trajectory_sliced = Trajectory.trajectory_slice_constant_dt(trajectory)
+fw = File_Writer(left_trajectory_sliced, right_trajectory_sliced, path_name)
 fw.write()
 trajectory.draw_trajectory()
