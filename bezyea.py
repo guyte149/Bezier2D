@@ -51,11 +51,14 @@ class CubicBezierCurve(object):
         m = y_tag / x_tag
         v = atan(m)
         ang = np.rad2deg(v)
+        if (y_tag>=0 and x_tag<0):
+            ang = 180+ang
+        # print ang , m
         # if ang >= 0:
         #     return 90 - ang
         # else:
         #     return -90 - ang
-        return 90 - ang
+        return ang
 
     def get_curve_length(self, res=1000.0):
         l = 0

@@ -2,7 +2,7 @@ import numpy as np
 import re
 from bezyea import *
 import matplotlib.pyplot as plt
-from file_writer import File_Writer
+from filewriter import FileWriter
 
 curves = []
 
@@ -48,6 +48,6 @@ print len(trajectory.right_trajectory)
 # for s in trajectory.left_trajectory:
 #     print s
 right_trajectory_sliced, left_trajectory_sliced = Trajectory.trajectory_slice_constant_dt(trajectory)
-fw = File_Writer(left_trajectory_sliced, right_trajectory_sliced, path_name)
+fw = FileWriter(left_trajectory_sliced, right_trajectory_sliced, path_name)
 fw.write()
 trajectory.draw_trajectory()

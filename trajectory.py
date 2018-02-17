@@ -149,7 +149,8 @@ class Trajectory(object):
         plt.show()
 
     def get_normal_points(self, point, width, heading):
-        angle = 90 - heading
+        angle = heading
+        # print angle
         vl = width * 0.5 * np.array([np.cos(np.deg2rad(angle + 90)), np.sin(np.deg2rad(angle + 90))])
         vr = width * 0.5 * np.array([np.cos(np.deg2rad(angle - 90)), np.sin(np.deg2rad(angle - 90))])
         # print v
@@ -174,11 +175,11 @@ class Trajectory(object):
             if abs(trajectory.right_trajectory[i + j].time - t) > abs(trajectory.right_trajectory[i + j + 1].time - t):
                 updated_right_trajectory.append(trajectory.right_trajectory[i + j + 1])
                 updated_left_trajectory.append(trajectory.left_trajectory[i + j + 1])
-                print updated_right_trajectory[-1].time
+                # print updated_right_trajectory[-1].time
             else:
                 updated_right_trajectory.append(trajectory.right_trajectory[i + j])
                 updated_left_trajectory.append(trajectory.left_trajectory[i + j])
-                print updated_right_trajectory[-1].time
+                # print updated_right_trajectory[-1].time
 
             i = i + j
         updated_left_trajectory.append(trajectory.left_trajectory[-1])
