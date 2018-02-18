@@ -64,8 +64,6 @@ class Trajectory(object):
             left_trajectory.append(Setpoint(np.array([0, 0]), 0, 0, 0, 0, 0, 0))
 
         time = 0
-        right_pos = 0
-        left_pos = 0
         right_trajectory[0] = Setpoint(p=0, v=0)
         left_trajectory[0] = Setpoint(p=0, v=0)
         right_trajectory[0].point, left_trajectory[0].point = self.get_normal_points(self.setpoints[0].point, width,
@@ -83,12 +81,12 @@ class Trajectory(object):
 
             # print "dx = {}".format(np.linalg.norm(left_trajectory[i].point - left_trajectory[i - 1].point))
 
-            right_pos = right_pos + right_trajectory[i].p
-            left_pos = left_pos + left_trajectory[i].p
-
             is_right_turn = self.setpoints[i].curvature <= 0
 
             # calculate the velocity for both sides based on the curvature
+            # if left_trajectory[i].p >= 1.61664109064914:
+            #     print ''
+
             radius = abs(1 / self.setpoints[i].curvature)
             big_radius = radius + (width / 2.0)
             small_radius = radius - (width / 2.0)
@@ -120,6 +118,9 @@ class Trajectory(object):
 
             right_trajectory[i - 1].a = (right_trajectory[i].v - right_trajectory[i - 1].v) / dt
             left_trajectory[i - 1].a = (left_trajectory[i].v - left_trajectory[i - 1].v) / dt
+
+            # if left_trajectory[i].v >= 1.22976637137963:
+                # print ""
 
         right_trajectory[0].a = 0
         right_trajectory[-1].a = 0

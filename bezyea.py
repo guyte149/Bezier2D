@@ -51,8 +51,11 @@ class CubicBezierCurve(object):
         m = y_tag / x_tag
         v = atan(m)
         ang = np.rad2deg(v)
-        if (y_tag>=0 and x_tag<0):
-            ang = 180+ang
+        if y_tag >= 0 and x_tag < 0:
+            ang = 180 + ang
+        if x_tag < 0 and y_tag < 0:
+            print ang
+            return 360 - ang
         # print ang , m
         # if ang >= 0:
         #     return 90 - ang

@@ -36,14 +36,16 @@ for i in xrange(len(waypoints) - 1):
     ang1 = waypoints[i + 1][1]
 
     curves.append(CubicBezierCurve.create_curve(p0, ang0, p1, ang1))
-
+# > 0,0,90
+# # > 1,1,0
+# # > 3,-1.575,0
 print("\n[-] Done! Calculating trajectory...")
 
 path = BezierPath(curves)
 trajectory = Trajectory(path)
 
 # trajectory.build_center_trajectory(0.67, 1, 1)
-trajectory.build_trajectory(0.67, 1.6, 1)
+trajectory.build_trajectory(0.67, 1.4, 0.7)
 print len(trajectory.right_trajectory)
 # for s in trajectory.left_trajectory:
 #     print s
