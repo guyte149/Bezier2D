@@ -166,7 +166,7 @@ class Trajectory(object):
         self.right_trajectory = right_trajectory
         self.left_trajectory = left_trajectory
 
-    def draw_trajectory(self, filename, dir):
+    def draw_trajectory(self, filename, dir=""):
         plt.subplots(figsize=(18, 7))
         plt.subplots(figsize=(18, 7))
         plt.subplot(1, 2, 1)

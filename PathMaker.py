@@ -114,19 +114,24 @@ if path_name:
     print directory
     fw = FileWriter(left_trajectory_sliced, right_trajectory_sliced, name=path_name, dir=directory)
     fw.write()
-trajectory.draw_trajectory(path_name, directory)
+    trajectory.draw_trajectory(path_name, directory)
+    img = Image.open(directory + "/" + path_name + ".png")
+    draw = ImageDraw.Draw(img)
+    size = 35
+    font = ImageFont.truetype("arial.ttf", size)
+    for i in range(0, len(points_text_list)):
+        draw.text((820, (i * size)), points_text_list[i], (255, 0, 0), font=font)
+    img.save(path_name + '.png')
+    os.startfile(path_name + '.png')
+else:
+    directory = ""
+    trajectory.draw_trajectory(path_name, directory)
 points_text_list.append("max_v = {}, max_a = {}".format(max_v, max_a))
 points_text_list.append("total_time = {}".format(right_trajectory_sliced[-1].time))
-img = Image.open(path_name + ".png")
-draw = ImageDraw.Draw(img)
-size = 35
-font = ImageFont.truetype("arial.ttf", size)
+
 # draw.text((x, y),"Sample Text",(r,g,b))
 
-for i in range(0, len(points_text_list)):
-    draw.text((820, (i * size)), points_text_list[i], (255, 0, 0), font=font)
-img.save(path_name + '.png')
-os.startfile(path_name + '.png')
+
 
     # > 0,0,90
     # > -0.65,4.3,90
