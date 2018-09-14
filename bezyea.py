@@ -41,20 +41,34 @@ class CubicBezierCurve(object):
         y_tag = self.bezier_derivative(t)[1]
         x_tagai = self.second_bezier_derivative(t)[0]
         y_tagai = self.second_bezier_derivative(t)[1]
-
-        return (x_tag * y_tagai - y_tag * x_tagai) / np.power((x_tag * x_tag) + (y_tag * y_tag), 1.5)
+        number = (x_tag * y_tagai - y_tag * x_tagai) / np.power((x_tag * x_tag) + (y_tag * y_tag), 1.5)
+        if number == 0:
+            number = number
+        # print number
+        #     number = 6.9533558078350043e-310
+        return number
 
     def get_angle(self, t):
         der = self.bezier_derivative(t)
         x_tag = der[0]
         y_tag = der[1]
+
+        # if we are going straight up, we can't divide by zero and just return 90 deg
+        if x_tag == 0:
+            return 90
+        # > 0, 0, 90
+        # > 0, 3.15, 90
+        # > 2.5, 4.25, 45
+        # > 3.75, 5.275, 0
+        # > 4.65, 5.275, 0
+        # >
         m = y_tag / x_tag
         v = atan(m)
         ang = np.rad2deg(v)
         if y_tag >= 0 and x_tag < 0:
             ang = 180 + ang
         if x_tag < 0 and y_tag < 0:
-            print ang
+            # print ang
             return 360 - ang
         # print ang , m
         # if ang >= 0:
@@ -90,8 +104,6 @@ class CubicBezierCurve(object):
         for i in np.arange(0, 1, step):
             # if(i%)
             # bar.next()
-
-
             p1 = self(i)
             norm = np.linalg.norm(p1 - last_p)
             curr_arc += norm

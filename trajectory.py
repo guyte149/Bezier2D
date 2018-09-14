@@ -13,9 +13,11 @@ class Trajectory(object):
 
     def build_trajectory(self, width, max_v, max_a):
         self.build_center_trajectory(width, max_v, max_a)
-        self.build_parallels_trajectories(width=width)
+        self.build_parallels_trajectories(width=width, max_v=max_v)
 
     def build_center_trajectory(self, width, max_v, max_a):
+
+        np.seterr(all='raise')
 
         self.setpoints = self.path.get_setpoints()
         # manually set the first setpoint
@@ -25,14 +27,19 @@ class Trajectory(object):
         self.setpoints[0].curvature = 0
 
         for i in xrange(1, len(self.setpoints) - 1, 1):
-            radius = abs(1 / self.setpoints[i].curvature)
 
-            if radius < width / 2.0:
-                print "********** WARNING: A radius could not be physically followed by the robot ***********"
+            if self.setpoints[i].curvature != 0:
+                radius = abs(1.0 / self.setpoints[i].curvature)
 
-            big_radius = radius + (width / 2.0)
-            small_radius = radius - (width / 2.0)
-            isolated_max_v = (max_v * (1.0 + (small_radius / big_radius))) / 2.0
+                if radius < width / 2.0:
+                    print "********** WARNING: A radius could not be physically followed by the robot ***********"
+                # print radius
+                big_radius = radius + (width / 2.0)
+                small_radius = radius - (width / 2.0)
+                isolated_max_v = (max_v * (1.0 + (small_radius / big_radius))) / 2.0
+            else:
+                isolated_max_v = max_v
+
             # v^2 = v0^2 + 2a*dx
             kinematic_v = np.sqrt(
                 np.power(self.setpoints[i - 1].v, 2) + (2 * max_a * (self.setpoints[i].p - self.setpoints[i - 1].p)))
@@ -55,7 +62,7 @@ class Trajectory(object):
             if self.setpoints[i + 1].v < self.setpoints[i].v < kinematic_v:
                 self.setpoints[i].a = 0
 
-    def build_parallels_trajectories(self, width):
+    def build_parallels_trajectories(self, width, max_v):
         right_trajectory = []
         left_trajectory = []
 
@@ -86,31 +93,56 @@ class Trajectory(object):
             # calculate the velocity for both sides based on the curvature
             # if left_trajectory[i].p >= 1.61664109064914:
             #     print ''
-
-            radius = abs(1 / self.setpoints[i].curvature)
-            big_radius = radius + (width / 2.0)
-            small_radius = radius - (width / 2.0)
-            big_v = (2 * self.setpoints[i].v * big_radius) / (big_radius + small_radius)
-            small_v = (2 * self.setpoints[i].v * small_radius) / (big_radius + small_radius)
-
-            if is_right_turn:
-                right_trajectory[i].v = small_v
-                left_trajectory[i].v = big_v
+            if self.setpoints[i].curvature != 0:
+                radius = abs(1.0 / self.setpoints[i].curvature)
+                big_radius = radius + (width / 2.0)
+                small_radius = radius - (width / 2.0)
+                big_v = (2 * self.setpoints[i].v * big_radius) / (big_radius + small_radius)
+                small_v = (2 * self.setpoints[i].v * small_radius) / (big_radius + small_radius)
+                if is_right_turn:
+                    right_trajectory[i].v = small_v
+                    left_trajectory[i].v = big_v
+                else:
+                    right_trajectory[i].v = big_v
+                    left_trajectory[i].v = small_v
             else:
-                right_trajectory[i].v = big_v
-                left_trajectory[i].v = small_v
+                right_trajectory[i].v = self.setpoints[i].v
+                left_trajectory[i].v = self.setpoints[i].v
+                # print self.setpoints[i].curvature
+                # print self.setpoints[i-1].curvature
+                # print right_trajectory[i-1].v
+                # print left_trajectory[i-1].v
+                # exit(0)
 
             # calculate the time at the current setpoint
             dx = self.setpoints[i - 1].p - self.setpoints[i].p
             roots = np.roots([0.5 * self.setpoints[i].a, self.setpoints[i].v, dx])
+            # print self.setpoints[i]
             if len(roots[roots > 0]) < 1:
                 dt = 0.01
             elif not np.isreal(np.min(roots[roots > 0])):
                 dt = 0.01
+                # print "dsadas"
+            elif np.min(roots[roots > 0]) > 0.01:
+                # print roots
+                # print roots
+                # print self.right_trajectory[i]
+                # print dx
+                # print self.right_trajectory[i-1]
+                # print self.right_trajectory[i - 2]
+                # print self.right_trajectory[i - 3]
+                # print self.right_trajectory[i - 4]
+                dt = 0.0000000001
             else:
                 dt = np.min(roots[roots > 0])
+                # if dt < 0.01:
+                # dt = 0.01
+
+                # print roots
+
             time += dt
-            # print dt
+
+            # print time
 
             self.setpoints[i].time = time
             right_trajectory[i].time = time
@@ -120,7 +152,7 @@ class Trajectory(object):
             left_trajectory[i - 1].a = (left_trajectory[i].v - left_trajectory[i - 1].v) / dt
 
             # if left_trajectory[i].v >= 1.22976637137963:
-                # print ""
+            # print ""
 
         right_trajectory[0].a = 0
         right_trajectory[-1].a = 0
@@ -134,20 +166,26 @@ class Trajectory(object):
         self.right_trajectory = right_trajectory
         self.left_trajectory = left_trajectory
 
-    def draw_trajectory(self):
-        # plt.axes().set_aspect('equal', 'datalim')
-        plt.subplot(2, 1, 1)
+    def draw_trajectory(self, filename, dir):
+        plt.subplots(figsize=(18, 7))
+        plt.subplots(figsize=(18, 7))
+        plt.subplot(1, 2, 1)
+        plt.axis('equal')
         plt.plot([s.point[0] for s in self.setpoints], [s.point[1] for s in self.setpoints],
                  [r.point[0] for r in self.right_trajectory], [r.point[1] for r in self.right_trajectory],
                  [l.point[0] for l in self.left_trajectory], [l.point[1] for l in self.left_trajectory])
         plt.title("trajectory")
-        plt.subplot(2, 1, 2)
+        plt.subplot(1, 2, 2)
         plt.plot([c.time for c in self.setpoints], [c.v for c in self.setpoints],
                  [r.time for r in self.right_trajectory], [r.v for r in self.right_trajectory],
                  [l.time for l in self.left_trajectory], [l.v for l in self.left_trajectory])
         plt.ylabel("velocity")
         plt.xlabel("time")
-        plt.show()
+
+        if filename:
+            plt.savefig(filename + '.png')
+        else:
+            plt.show()
 
     def get_normal_points(self, point, width, heading):
         angle = heading
@@ -189,7 +227,7 @@ class Trajectory(object):
 
 
 class Setpoint(object):
-    def __init__(self, point=np.array([0, 0]), p=0, v=0, a=0, curvature=0, heading=0, time=0):
+    def __init__(self, point=np.array([0, 0]), p=0, v=0, a=0, curvature=0., heading=0, time=0):
         self.p = p
         self.point = point
         self.v = v
