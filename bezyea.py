@@ -147,9 +147,16 @@ class CubicBezierCurve(object):
 
         return CubicBezierCurve(p0, c0, c1, p1)
 
-    def __str__(self):
-        return 'p0- {} \nc0- {} \nc1- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.p1,
-                                                                      self.get_curve_length())
+    @staticmethod
+    def connect_curve(curve, q3, ang2):
+        q1 = (2 * curve.p1) - curve.c1
+        q2 = (curve.c0 + (2 * q1)) - (2 * curve.c1)
+        Q = CubicBezierCurve(curve.p1, q1, q2, q3)
+        return Q
+
+def __str__(self):
+    return 'p0- {} \nc0- {} \nc1- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.p1,
+                                                                  self.get_curve_length())
 
 
 class BezierPath(object):
