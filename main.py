@@ -8,10 +8,13 @@ ang1 = 90
 p2 = np.array([2, 2])
 ang2 = 0
 
-c = CubicBezierCurve.create_curve(p0, ang0, p1, ang1)
-q = CubicBezierCurve.connect_curve(c, p2, ang2)
-path = BezierPath([c, q])
+c = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)
+q = CubicBezierCurve.create_curve(p0, ang0, p1, ang1)
+# q = CubicBezierCurve.connect_curve(c, p2, ang2)
+path = BezierPath([c])
 path.draw_path()
+p = BezierPath([q])
+# p.draw_path()
 
 # y_list = []
 # x_list = []

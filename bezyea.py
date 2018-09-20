@@ -5,18 +5,12 @@ from trajectory import *
 from progress.bar import Bar
 
 
-class CubicBezierCurve(object):
-    def __init__(self, p0, c0, c1, p1):
-        self.p0 = p0
-        self.p1 = p1
-        self.c0 = c0
-        self.c1 = c1
+class BezierCurve(object):
+    def __init__(self):
+        pass
 
     def __call__(self, *args, **kwargs):
-        t = args[0]
-        omt = 1 - t
-        return (self.p0 * omt * omt * omt) + (self.c0 * 3 * omt * omt * t) + (self.c1 * 3 * omt * t * t) + (
-            self.p1 * t * t * t)
+        raise NotImplemented
 
     def draw_curve(self, res=1000.0):
         x_list = []
@@ -29,12 +23,10 @@ class CubicBezierCurve(object):
         plt.show()
 
     def bezier_derivative(self, t):
-        omt = 1 - t
-        return 3 * omt * omt * (self.c0 - self.p0) + 6 * omt * t * (self.c1 - self.c0) + 3 * t * t * (self.p1 - self.c1)
+        raise NotImplemented
 
     def second_bezier_derivative(self, t):
-        omt = 1 - t
-        return 6 * omt * (self.c1 - (2 * self.c0) + self.p0) + 6 * t * (self.p1 - (2 * self.c1) + self.c0)
+        raise NotImplemented
 
     def get_curvature(self, t):
         x_tag = self.bezier_derivative(t)[0]
@@ -136,6 +128,40 @@ class CubicBezierCurve(object):
 
     @staticmethod
     def create_curve(p0, ang0, p1, ang1):
+        raise NotImplemented
+
+    @staticmethod
+    def connect_curve(curve, q3, ang2):
+        raise NotImplemented
+
+    def __str__(self):
+        raise NotImplemented
+
+
+class CubicBezierCurve(BezierCurve):
+    def __init__(self, p0, c0, c1, p1):
+        super(CubicBezierCurve, self).__init__()
+        self.p0 = p0
+        self.p1 = p1
+        self.c0 = c0
+        self.c1 = c1
+
+    def __call__(self, *args, **kwargs):
+        t = args[0]
+        omt = 1 - t
+        return (self.p0 * omt * omt * omt) + (self.c0 * 3 * omt * omt * t) + (self.c1 * 3 * omt * t * t) + (
+            self.p1 * t * t * t)
+
+    def bezier_derivative(self, t):
+        omt = 1 - t
+        return 3 * omt * omt * (self.c0 - self.p0) + 6 * omt * t * (self.c1 - self.c0) + 3 * t * t * (self.p1 - self.c1)
+
+    def second_bezier_derivative(self, t):
+        omt = 1 - t
+        return 6 * omt * (self.c1 - (2 * self.c0) + self.p0) + 6 * t * (self.p1 - (2 * self.c1) + self.c0)
+
+    @staticmethod
+    def create_curve(p0, ang0, p1, ang1):
         l = np.linalg.norm(p1 - p0)
         u = 0.5 * l
 
@@ -153,6 +179,7 @@ class CubicBezierCurve(object):
         q2 = (curve.c0 + (2 * q1)) - (2 * curve.c1)
         Q = CubicBezierCurve(curve.p1, q1, q2, q3)
         return Q
+
 
 def __str__(self):
     return 'p0- {} \nc0- {} \nc1- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.p1,
@@ -172,11 +199,15 @@ class BezierPath(object):
         # print 'seg={}   curves seg - {}'.format(seg, self.curves[seg])
         return self.curves[0][seg](t)
 
+    def get_angle(self, t, seg):
+        return self.curves[0][seg].get_angle(t)
+
     def draw_path(self, res=1000.0):
         x_list = []
         y_list = []
         for s in xrange(0, len(self.curves[0])):
             for t in xrange(0, int(res + 1)):
+                print self.get_angle(t / res, s)
                 x_list.append(self(t / res, s)[0])
                 y_list.append(self(t / res, s)[1])
                 # print 't={},  R={}'.format(t / res, 1 / self.get_curvature(t / res))
@@ -184,9 +215,6 @@ class BezierPath(object):
         plt.axes().set_aspect('equal', 'datalim')
         plt.plot(x_list, y_list)
         plt.show()
-
-    def get_angle(self, t, seg):
-        return self.curves[0][seg].get_angle(t)
 
     def get_setpoints(self, arc_length=0.00005):
         l = []
@@ -198,3 +226,58 @@ class BezierPath(object):
 
     def __str__(self):
         return self.curves
+
+
+class QuanticBezierCurve(BezierCurve):
+    def __init__(self, p0, c0, c1, c2, c3, p1):
+        super(QuanticBezierCurve, self).__init__()
+        self.p0=p0
+        self.c0=c0
+        self.c1=c1
+        self.c2=c2
+        self.c3=c3
+        self.p1=p1
+
+
+    def __call__(self, *args, **kwargs):
+        t = args[0]
+        omt = 1 - t
+        return (self.p0 * omt * omt * omt * omt *omt) + (self.c0 * 5 * t * omt * omt * omt * omt) + (
+            self.c1 * 10 * t * t * omt * omt * omt) + (self.c2 * 10 * t * t * t * omt * omt) + (
+            self.c3 * 5 * t * t * t * t * omt) + (self.p1 * t * t * t * t *t)
+
+
+    def bezier_derivative(self, t):
+        omt = 1 - t
+        return 5 * t * t * t * t *(self.p1 - self.c3) + 20 * omt * t * t * t * (self.c3 - self.c2) + (
+             30 * omt * omt * t * t * (self.c2 - self.c1)) + 20 * omt * omt * omt * t * (self.c1 - self.c0) + (
+             5 * omt * omt * omt * omt * omt * (self.c0 - self.p0))
+
+    def second_bezier_derivative(self, t):
+        return 20 * (self.p1 - 5 * self.c3 + 10 * self.c2 - 10 * self.c1 + 5 * self.c0 - self.p0) * t * t * t + (
+            15 * (4 * self.c3 - 16 * self.c2 + 24 * self.c1 - 16 * self.c0 + 4 * self.p0) * t * t) + (
+            10 * (6 * self.c2 - 18 * self.c1 + 18 * self.c0 - 6 * self.p0) * t) + (
+            20 * self.c1 - 40 * self.c0 + 20 * self.p0)
+
+    @staticmethod
+    def create_curve(p0, ang0, p1, ang1):
+        l = np.linalg.norm(p1 - p0)
+        u = 0.3 * l
+
+        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
+        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
+
+        c0 = p0 + u * v0
+        c1 = c0
+        c2 = p1 - u * v1
+        c3 = c2
+
+        return QuanticBezierCurve(p0, c0, c1, c2, c3,  p1)
+
+    @staticmethod
+    def connect_curve(curve, q3, ang2):
+        pass
+
+def __str__(self):
+    return 'p0- {} \nc0- {} \nc1- {} \nc2- {} \nc3- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.c2, self.c3, self.p1,
+                                                                  self.get_curve_length())
