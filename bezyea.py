@@ -40,6 +40,22 @@ class BezierCurve(object):
         #     number = 6.9533558078350043e-310
         return number
 
+    def get_max_curvature_change(self, res=1000):
+        max_curvature_change = 0
+        for i in range(0, res - 1, 1):
+            absolute_curvature_change = abs(self.get_curvature((i + 1) / res)) - abs(self.get_curvature(i / res))
+            if absolute_curvature_change > max_curvature_change:
+                max_curvature_change = absolute_curvature_change
+        return max_curvature_change
+
+    def get_average_curvature_change(self, res=1000):
+        sum_curvature_change = 0
+        for i in range(0, res - 1, 1):
+            absolute_curvature_change = abs(self.get_curvature((i + 1) / res)) - abs(self.get_curvature(i / res))
+            sum_curvature_change += absolute_curvature_change
+        average_curvature_change = sum_curvature_change / res
+        return average_curvature_change
+
     def get_angle(self, t):
         der = self.bezier_derivative(t)
         x_tag = der[0]
@@ -231,33 +247,31 @@ class BezierPath(object):
 class QuanticBezierCurve(BezierCurve):
     def __init__(self, p0, c0, c1, c2, c3, p1):
         super(QuanticBezierCurve, self).__init__()
-        self.p0=p0
-        self.c0=c0
-        self.c1=c1
-        self.c2=c2
-        self.c3=c3
-        self.p1=p1
-
+        self.p0 = p0
+        self.c0 = c0
+        self.c1 = c1
+        self.c2 = c2
+        self.c3 = c3
+        self.p1 = p1
 
     def __call__(self, *args, **kwargs):
         t = args[0]
         omt = 1 - t
-        return (self.p0 * omt * omt * omt * omt *omt) + (self.c0 * 5 * t * omt * omt * omt * omt) + (
+        return (self.p0 * omt * omt * omt * omt * omt) + (self.c0 * 5 * t * omt * omt * omt * omt) + (
             self.c1 * 10 * t * t * omt * omt * omt) + (self.c2 * 10 * t * t * t * omt * omt) + (
-            self.c3 * 5 * t * t * t * t * omt) + (self.p1 * t * t * t * t *t)
-
+                   self.c3 * 5 * t * t * t * t * omt) + (self.p1 * t * t * t * t * t)
 
     def bezier_derivative(self, t):
         omt = 1 - t
-        return 5 * t * t * t * t *(self.p1 - self.c3) + 20 * omt * t * t * t * (self.c3 - self.c2) + (
-             30 * omt * omt * t * t * (self.c2 - self.c1)) + 20 * omt * omt * omt * t * (self.c1 - self.c0) + (
-             5 * omt * omt * omt * omt * omt * (self.c0 - self.p0))
+        return 5 * t * t * t * t * (self.p1 - self.c3) + 20 * omt * t * t * t * (self.c3 - self.c2) + (
+            30 * omt * omt * t * t * (self.c2 - self.c1)) + 20 * omt * omt * omt * t * (self.c1 - self.c0) + (
+                   5 * omt * omt * omt * omt * omt * (self.c0 - self.p0))
 
     def second_bezier_derivative(self, t):
         return 20 * (self.p1 - 5 * self.c3 + 10 * self.c2 - 10 * self.c1 + 5 * self.c0 - self.p0) * t * t * t + (
             15 * (4 * self.c3 - 16 * self.c2 + 24 * self.c1 - 16 * self.c0 + 4 * self.p0) * t * t) + (
-            10 * (6 * self.c2 - 18 * self.c1 + 18 * self.c0 - 6 * self.p0) * t) + (
-            20 * self.c1 - 40 * self.c0 + 20 * self.p0)
+                   10 * (6 * self.c2 - 18 * self.c1 + 18 * self.c0 - 6 * self.p0) * t) + (
+                   20 * self.c1 - 40 * self.c0 + 20 * self.p0)
 
     @staticmethod
     def create_curve(p0, ang0, p1, ang1):
@@ -272,12 +286,23 @@ class QuanticBezierCurve(BezierCurve):
         c2 = p1 - u * v1
         c3 = c2
 
-        return QuanticBezierCurve(p0, c0, c1, c2, c3,  p1)
+        return QuanticBezierCurve(p0, c0, c1, c2, c3, p1)
+
+    @staticmethod
+    def rate_curve(curve, optimal_curve):
+        length_rate = optimal_curve.get_curve_length / curve.get_curve_length
+        max_curvature_change_rate = optimal_curve.get_max_curvature_change / curve.get_max_curvature_change
+        average_curvature_change_rate = optimal_curve.get_average_curvature_change / curve.get_average_curvature_change
+
+        final_rate = (length_rate + max_curvature_change_rate + average_curvature_change_rate) * (100 / 3)
+        return final_rate
 
     @staticmethod
     def connect_curve(curve, q3, ang2):
         pass
 
+
 def __str__(self):
-    return 'p0- {} \nc0- {} \nc1- {} \nc2- {} \nc3- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.c2, self.c3, self.p1,
-                                                                  self.get_curve_length())
+    return 'p0- {} \nc0- {} \nc1- {} \nc2- {} \nc3- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.c2,
+                                                                                    self.c3, self.p1,
+                                                                                    self.get_curve_length())
