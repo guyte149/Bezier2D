@@ -9,11 +9,11 @@ p2 = np.array([2, 2])
 ang2 = 0
 
 # c1 = QuanticBezierCurve(p0, np.array([0, 0.25]), np.array([0.25, 0.5]), np.array([0.75, 0.5]), np.array([1, 0.75]), p1)
-# c1 = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)
+c1 = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)
 # c1 = QuanticBezierCurve.create_the_best_curvature_changes_curve(p0, ang0, p1, ang1)
 # c1 = QuanticBezierCurve.create_the_shorter_curve(p0, ang0, p1, ang1)
 # print c.get_max_curvature_change()
-c1 = QuanticBezierCurve.random_search(p0, ang0, p1, ang1)
+# c1 = QuanticBezierCurve.random_search(p0, ang0, p1, ang1)
 print 'Curvature change at the beginning: {}'.format(c1.get_curvature(1.0 / 150.0) - c1.get_curvature(0.0 / 150.0))
 print 'Curvature change at the end: {}'.format(c1.get_curvature(150.0 / 150.0) - c1.get_curvature(149.0 / 150.0))
 print 'Max curvature change: {}'.format(c1.get_max_curvature_change())

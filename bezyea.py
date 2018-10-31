@@ -340,19 +340,20 @@ class QuanticBezierCurve(BezierCurve):
     @staticmethod
     def create_curve(p0, ang0, p1, ang1):
         l = np.linalg.norm(p1 - p0)
-        u = 0.25 * l
+        u = 0.275 * l
 
         v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
         v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
 
         value_x = (p1[0] - p0[0]) * 0.25
-        value_y = p1[1] - p0[1]
+        # value_y = p1[1] - p0[1]
 
         c0 = p0 + u * v0
-        c1 = np.array([c0[0] + value_x, c0[1] + c0[1] * 0.5 * l])
+        c1 = np.array([c0[0] + value_x, c0[1] + c0[1] * l / (l * l)])
         # c1 = np.array([c0[0] + u, c0[1] * 2])
         c3 = p1 - u * v1
-        c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / 2])
+        c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / (l * l)])
+        # print c1[1], c2[1]
         # c2 = np.array([c3[0] - u, c3[1] / 2])
 
         return QuanticBezierCurve(p0, c0, c1, c2, c3, p1)
@@ -418,8 +419,8 @@ class QuanticBezierCurve(BezierCurve):
 
     @staticmethod
     def rate_curve(curve):
-        # return curve.get_max_curvature_change() + abs(curve.get_average_curvature_change())
-        return abs(curve.get_average_curvature_change())
+        return curve.get_max_curvature_change() + abs(curve.get_average_curvature_change())
+        # return abs(curve.get_average_curvature_change())
 
     @staticmethod
     def random_search(p0, ang0, p1, ang1, res=200):
@@ -430,16 +431,16 @@ class QuanticBezierCurve(BezierCurve):
         v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
         v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
 
-        best_vector_multipler0 = 0.25
-        best_vector_multipler1 = -0.25
+        best_vector_multipler0 = 0.275
+        best_vector_multipler1 = -0.275
 
         c0 = p0 + best_vector_multipler0 * v0
         c3 = p1 - best_vector_multipler1 * v1
 
         value_x = (p1[0] - p0[0]) * 0.25
 
-        best_c1 = np.array([c0[0] + value_x, c0[1] + c0[1] * 0.5 * l])
-        best_c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / 2])
+        best_c1 = np.array([c0[0] + value_x, c0[1] + c0[1] * l / (l * l)])
+        best_c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / (l * l)])
 
         best_curve = QuanticBezierCurve(p0, c0, best_c1, best_c2,
                                         c3, p1)
@@ -462,41 +463,33 @@ class QuanticBezierCurve(BezierCurve):
                 best_curve = new_curve
         return best_curve
 
-    # @staticmethod
-    # def random_search(p0, ang0, p1, ang1, res=5):
-    #     l = np.linalg.norm(p1 - p0)
-    #
-    #     v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
-    #     v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
-    #
-    #     best_vector_multipler0 = 0.3
-    #     best_vector_multipler1 = -0.3
-    #     best_c1 = p0 + best_vector_multipler0 * l * v0
-    #     best_c2 = p1 + best_vector_multipler1 * l * v1
-    #
-    #     best_curve = QuanticBezierCurve(p0, p0 + best_vector_multipler0 * l * v0, best_c1, best_c2,
-    #                                     p1 + best_vector_multipler1 * l * v1, p1)
-    #     # best_rate = QuanticBezierCurve.rate_curve(best_curve)
-    #     curves = [best_curve]
-    #     print curves[0].rate_curve(curves[0])
-    #     for i in range(1, res, 1):
-    #         new_vector_multipler0 = best_vector_multipler0 + uniform(-1, 1)
-    #         new_c1 = best_c1 + np.array((uniform(-1, 1), uniform(-1, 1)))
-    #         new_c2 = best_c2 + np.array((uniform(-1, 1), uniform(-1, 1)))
-    #         new_vector_multipler1 = best_vector_multipler1 + uniform(-1, 1)
-    #         new_curve = QuanticBezierCurve(p0, p0 + new_vector_multipler0 * l * v0, new_c1, new_c2,
-    #                                        p1 + new_vector_multipler1 * l * v1, p1)
-    #         curves.append(new_curve)
-    #
-    #         # new_rate = QuanticBezierCurve.rate_curve(new_curve)
-    #         if new_vector_multipler0 > 0 and new_vector_multipler1 < 0:
-    #             print curves[i].rate_curve(curves[i])
-    #             best_vector_multipler0 = new_vector_multipler0
-    #             best_vector_multipler1 = new_vector_multipler1
-    #             best_c1 = new_c1
-    #             best_c2 = new_c2
-    #
-    #     return curves
+    @staticmethod
+    def particle_swarm(p0, ang0, p1, ang1, res=25):
+        curves = []
+        l = np.linalg.norm(p1 - p0)
+
+        # random_length = 0.1 * l / sqrt(2)
+
+        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
+        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
+
+        best_rate = 9999
+        best_curve_place = 0
+
+        for i in range(0, res, 1):
+            u0 = uniform()
+            u1 = uniform()
+
+            c0 = p0 + u0 * v0
+            c1 = np.array([uniform(), uniform()])
+            c2 = np.array([uniform(), uniform()])
+            c3 = p1 - u1 * v1
+            curves.append(QuanticBezierCurve(p0, c0, c1, c2, c3, p1))
+            new_rate = curves[i].rate_curve(curves[i])
+            if best_rate > new_rate:
+                best_rate = new_rate
+                best_curve_place = i
+
 
     @staticmethod
     def connect_curve(curve, q3, ang2):
