@@ -47,11 +47,21 @@ class BezierCurve(object):
         #     number = 6.9533558078350043e-310
         return number
 
+    def get_max_curvature(self):
+        l = np.linalg.norm(self.p1 - self.p0)
+        res = 15.0 / (sqrt(2)) * l
+        max_curvature = 0.0
+        for i in np.arange(0.0, res + 1.0, 1.0):
+            new_curvature = abs(self.get_curvature(i / res))
+            if max_curvature < new_curvature:
+                max_curvature = new_curvature
+        return max_curvature
+
     def get_max_curvature_change(self, res=15.0):
         l = np.linalg.norm(self.p1 - self.p0)
         res = 15.0 / (sqrt(2)) * l
         max_curvature_change = 0.0
-        for i in np.arange(0, res - 1.0, 1.0):
+        for i in np.arange(0.0, res - 1.0, 1.0):
             absolute_curvature_change = abs(self.get_curvature((i + 1) / res)) - abs(self.get_curvature(i / res))
             if absolute_curvature_change > max_curvature_change:
                 max_curvature_change = absolute_curvature_change
@@ -63,7 +73,7 @@ class BezierCurve(object):
         max_curvature_change = 0.0
         point_max0 = np.array([0, 0])
         point_max1 = np.array([0, 0])
-        for i in np.arange(0, res - 1.0, 1.0):
+        for i in np.arange(0.0, res - 1.0, 1.0):
             absolute_curvature_change = abs(self.get_curvature((i + 1) / res)) - abs(self.get_curvature(i / res))
             if absolute_curvature_change > max_curvature_change:
                 max_curvature_change = absolute_curvature_change
@@ -349,7 +359,7 @@ class QuanticBezierCurve(BezierCurve):
         # value_y = p1[1] - p0[1]
 
         c0 = p0 + u * v0
-        c1 = np.array([c0[0] + value_x, c0[1] + c0[1] * l / (l * l)])
+        c1 = np.array([c0[0] + value_x, c0[1] + c0[1] / l])
         # c1 = np.array([c0[0] + u, c0[1] * 2])
         c3 = p1 - u * v1
         c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / (l * l)])
@@ -419,7 +429,8 @@ class QuanticBezierCurve(BezierCurve):
 
     @staticmethod
     def rate_curve(curve):
-        return curve.get_max_curvature_change() + abs(curve.get_average_curvature_change())
+        return curve.get_max_curvature_change() + abs(curve.get_max_curvature())
+        # return curve.get_max_curvature_change() + abs(curve.get_average_curvature_change())
         # return abs(curve.get_average_curvature_change())
 
     @staticmethod
@@ -435,7 +446,7 @@ class QuanticBezierCurve(BezierCurve):
         best_vector_multipler1 = -0.275
 
         c0 = p0 + best_vector_multipler0 * v0
-        c3 = p1 - best_vector_multipler1 * v1
+        c3 = p1 + best_vector_multipler1 * v1
 
         value_x = (p1[0] - p0[0]) * 0.25
 
