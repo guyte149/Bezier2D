@@ -8,24 +8,32 @@ ang1 = 90
 p2 = np.array([2, 2])
 ang2 = 0
 
-# c1 = QuanticBezierCurve(p0, np.array([0, 0.25]), np.array([0.25, 0.5]), np.array([0.75, 0.5]), np.array([1, 0.75]), p1)
+# c1 = [QuanticBezierCurve.random_search(p0, ang0, p1, ang1)]
 # c1 = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)
-# c1 = QuanticBezierCurve.create_the_best_curvature_changes_curve(p0, ang0, p1, ang1)
-# c1 = QuanticBezierCurve.create_the_shorter_curve(p0, ang0, p1, ang1)
-# print c.get_max_curvature_change()
-c1 = QuanticBezierCurve.random_search(p0, ang0, p1, ang1)
-print 'Curvature change at the beginning: {}'.format(c1.get_curvature(1.0 / 150.0) - c1.get_curvature(0.0 / 150.0))
-print 'Curvature change at the end: {}'.format(c1.get_curvature(150.0 / 150.0) - c1.get_curvature(149.0 / 150.0))
-print 'Max curvature change: {}'.format(c1.get_max_curvature_change())
-print 'Rate curve: {}'.format(c1.rate_curve(c1))
-print 'Length curve: {}'.format(c1.get_curve_length())
+# c1 = QuanticBezierCurve.random_search(p0, ang0, p1, ang1)
+c1 = QuanticBezierCurve.start_curves_particle_swarm(p0, ang0, p1, ang1)
+c2 = QuanticBezierCurve.particle_swarm(c1, ang0, ang1, 0.1, 0.25)
+list_curves = [c2]
+# print c2.rate_curve(c2)
+# path = BezierPath(c2)
+# path.draw_path()
+for i in range(1, 5, 1):
+    c2 = QuanticBezierCurve.particle_swarm(c2, ang0, ang1, 0.1, 0.25)
+    list_curves.append(c2)
+path = BezierPath(c2)
+path.draw_path()
+
+# print 'Curvature change at the beginning: {}'.format(c1.get_curvature(1.0 / 150.0) - c1.get_curvature(0.0 / 150.0))
+# print 'Curvature change at the end: {}'.format(c1.get_curvature(150.0 / 150.0) - c1.get_curvature(149.0 / 150.0))
+# print 'Max curvature change: {}'.format(c1.get_max_curvature_change())
+# print 'Rate curve: {}'.format(c1.rate_curve(c1))
+# print 'Length curve: {}'.format(c1.get_curve_length())
 # print c1.get_curvature(0.5)
 # c1 = [QuanticBezierCurve.random_search(p0, ang0, p1, kang1)]
-# path = [BezierPath([c1[0]])]
-# for i in range(0, 5, 1):
+# path = [BezierPath(c1)]
+# for i in range(1, 3, 1):
 #     c1.append(QuanticBezierCurve.random_search(p0, ang0, p1, ang1))
-#     print c1[i].rate_curve(c1[i])
-# for t in range(0, 5, 1):
+# for t in range(0, 10, 1):
 #     path.append(BezierPath(([c1[t]])))
 #     path[t].draw_path()
 # c2 = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)
@@ -38,8 +46,9 @@ print 'Length curve: {}'.format(c1.get_curve_length())
 # print c2.rate_curve(c2)
 # print c1.get_max_curvature_change()
 # q1 = QuanticBezierCurve.random_search(p0, ang0, p1, ang1)
-p = BezierPath([c1])
-p.draw_path()
+# p = BezierPath([c1])
+# p = BezierPath(c1)
+# p.draw_path()
 # p = BezierPath([q])
 # p.draw_path()
 # print q.rate_curve(q)
@@ -56,7 +65,8 @@ p.draw_path()
 # p.draw_path()
 
 # y_list = []
-# x_list = []
+# x_list = []p0, ang0, p1, ang1)
+# TypeError: particle_swarm() takes at most 4 arguments (
 # for t in xrange(0, 1001):
 #     x_list.append(q(t/1000.0)[0])
 #     y_list.append(q(t/1000.0)[1])

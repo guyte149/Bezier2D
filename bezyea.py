@@ -1,10 +1,13 @@
 from __builtin__ import xrange
 
 import numpy as np
+import matplotlib.animation as animation
 import matplotlib.pyplot as plt
+
 from math import *
 
 from numpy.f2py.auxfuncs import throw_error
+from pyparsing import range
 
 from trajectory import *
 from random import *
@@ -120,7 +123,7 @@ class BezierCurve(object):
         #     return -90 - ang
         return ang
 
-    def get_curve_length(self, res=80.0):
+    def get_curve_length(self, res=1000.0):
         l = 0
         for t in xrange(0, int(res + 1)):
             if t / res < 1:
@@ -242,6 +245,8 @@ class BezierPath(object):
         self.curves = curves
         self.max_v = 2
         self.max_a = 2
+        self.fig = plt.figure()
+        self.plots = [plt.plot([], [])[0] for _ in range(len(curves[0]))]
 
     # first argument is t, second argument is curve number
     def __call__(self, *args, **kwaergs):
@@ -260,50 +265,60 @@ class BezierPath(object):
         y_list0 = []
         x_contorol_list = []
         y_contorol_list = []
-        for s in xrange(0, len(self.curves[0])):
+        # ax = plt.axes(xlim=(0, 2), ylim=(0, 100))
+        for s in xrange(0, len(self.curves)):
             for t in xrange(0, int(res + 1)):
                 # print self.get_angle(t / res, s)
                 x_list.append(self(t / res, s)[0])
                 y_list.append(self(t / res, s)[1])
-                # print 't={},  R={}'.format(t / res, 1 / self.get_curvature(t / res))
+
+            plt.plot(x_list, y_list)
+            x_list = []
+            y_list = []
+            # print 't={},  R={}'.format(t / res, 1 / self.get_curvature(t / res))
         #
         # for i in xrange(0, len(self.curves[0])):
         #     x_contorol_list.append(self.__str__()[0].c0[0][0])
         #     y_contorol_list.append(self(BezierPath.curves[0].c0[[1]])[1])
-        x_contorol_list.append(self.curves[0][0].c0[0])
-        x_contorol_list.append(self.curves[0][0].c1[0])
-        x_contorol_list.append(self.curves[0][0].c2[0])
-        x_contorol_list.append(self.curves[0][0].c3[0])
 
-        y_contorol_list.append(self.curves[0][0].c0[1])
-        y_contorol_list.append(self.curves[0][0].c1[1])
-        y_contorol_list.append(self.curves[0][0].c2[1])
-        y_contorol_list.append(self.curves[0][0].c3[1])
+        # x_contorol_list.append(self.curves[0][0].c0[0])
+        # x_contorol_list.append(self.curves[0][0].c1[0])
+        # x_contorol_list.append(self.curves[0][0].c2[0])
+        # x_contorol_list.append(self.curves[0][0].c3[0])
+        #
+        # y_contorol_list.append(self.curves[0][0].c0[1])
+        # y_contorol_list.append(self.curves[0][0].c1[1])
+        # y_contorol_list.append(self.curves[0][0].c2[1])
+        # y_contorol_list.append(self.curves[0][0].c3[1])
 
-        point_max_list = self.curves[0][0].get_point_with_max_curvature_change()
+        # point_max_list = self.curves[0][0].get_point_with_max_curvature_change()
 
-        l = np.linalg.norm(self.curves[0][0].p1 - self.curves[0][0].p0)
-        res = 15.0 / (sqrt(2)) * l
+        # l = np.linalg.norm(self.curves[0][0].p1 - self.curves[0][0].p0)
+        # res = 15.0 / (sqrt(2)) * l
 
-        for s in xrange(0, len(self.curves[0])):
-            for t in xrange(0, int(res + 1)):
-                # print self.get_angle(t / res, s)
-                x_list0.append(self(t / res, s)[0])
-                y_list0.append(self(t / res, s)[1])
+        # for s in xrange(0, len(self.curves[0])):
+        #     for t in xrange(0, int(res + 1)):
+        #         # print self.get_angle(t / res, s)
+        #         x_list0.append(self(t / res, s)[0])
+        #         y_list0.append(self(t / res, s)[1])
 
         # x_contorol_list.append(point_max[0])
         # y_contorol_list.append(point_max[1])
 
         # plt.axes().set_aspect('equal', 'datalim')
         plt.axis('equal')
-        plt.plot(x_list, y_list)
-        plt.plot(x_list0, y_list0, 'yo')
-        plt.plot(x_contorol_list, y_contorol_list, 'ro')
-        plt.plot(point_max_list[0][0], point_max_list[0][1], 'bo')
-        plt.plot(point_max_list[1][0], point_max_list[1][1], 'go')
+        # plt.plot(x_list, y_list)
+        # plt.plot(x_list0, y_list0, 'yo')
+        # plt.plot(x_contorol_list, y_contorol_list, 'ro')
+        # plt.plot(point_max_list[0][0], point_max_list[0][1], 'bo')
+        # plt.plot(point_max_list[1][0], point_max_list[1][1], 'go')
         # plt
         # .plot(np.array(self.curves[0].c0))
         # plt.plot(self.c1)
+        # plt.show()
+        self.animate_init
+        self.animate
+        self.animation_draw
         plt.show()
 
     def get_setpoints(self, arc_length=0.00005):
@@ -313,6 +328,26 @@ class BezierPath(object):
             l = l + c.get_setpoints(arc_length, start_position)
             start_position += l[-1].p
         return l
+
+    def animate_init(self):
+        # update plots
+        for i, plot in enumerate(self.plots):
+            plot.set_data(self.curves[0][i])
+
+        return self.plots
+
+    def animate(self, i):
+        # update plots
+        for j, plot in enumerate(self.plots):
+            plot.set_data([self.curves[j], i])
+
+        return self.plots
+
+    def animation_draw(self):
+        ani = animation.FuncAnimation(self.fig, self.animate, init_func=self.animate_init, frames=500,
+                                      interval=20, blit=True)
+        # plt.show()
+        return ani
 
     def __str__(self):
         return self.curves
@@ -360,81 +395,21 @@ class QuanticBezierCurve(BezierCurve):
 
         c0 = p0 + u * v0
         c1 = np.array([c0[0] + value_x, c0[1] + c0[1] / l])
-        # c1 = np.array([c0[0] + u, c0[1] * 2])
         c3 = p1 - u * v1
         c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / (l * l)])
         # print c1[1], c2[1]
-        # c2 = np.array([c3[0] - u, c3[1] / 2])
 
         return QuanticBezierCurve(p0, c0, c1, c2, c3, p1)
-
-    @staticmethod
-    def create_the_shorter_curve(p0, ang0, p1, ang1):
-        l = np.linalg.norm(p1 - p0)
-        u = 0.01 * l
-
-        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
-        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
-
-        c0 = p0 + u * v0
-        c3 = p1 - u * v1
-
-        m = (p1[1] - p0[1]) / (p1[0] - p0[0])
-        n = p0[1] - m * p0[0]
-        c1 = np.array([(p1[0] - p0[0]) / 2, m * (p1[0] - p0[0]) / 2 + n])
-        c2 = c1
-
-        return QuanticBezierCurve(p0, c0, c1, c2, c3, p1)
-
-    @staticmethod
-    def create_the_best_curvature_change_curve(p0, ang0, p1, ang1):
-        l = np.linalg.norm(p1 - p0)
-        r = 0.25 * l
-
-        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
-        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
-
-        v2 = np.array([np.sin(np.deg2rad(ang0)), np.cos(np.deg2rad(ang0))])
-        v3 = np.array([np.sin(np.deg2rad(ang1)), np.cos(np.deg2rad(ang1))])
-
-        the_midle = p0 + 0.5 * l * np.array([np.cos(np.deg2rad(ang0 / 2)), np.sin(np.deg2rad(ang0 / 2))])
-        the_midle_circle0 = np.array([0, the_midle[1]])
-        the_midle_circle1 = np.array([the_midle[0] * 2, the_midle[1]])
-        print (the_midle_circle0, the_midle, the_midle_circle1)
-
-        end_point0 = the_midle_circle0 + r * v0
-        end_point1 = the_midle
-        end_point2 = the_midle_circle1 - r * v1
-        end_point3 = p1
-
-        print (end_point0, end_point1, end_point2, end_point3)
-
-        u = r * 4 * (sqrt(2) - 1) / 3
-
-        c0 = end_point0 + u * v0
-        c1 = end_point1 + u * v2
-        c2 = end_point2 - u * v3
-        c3 = end_point3 - u * v1
-        print (c0, c1, c2, c3)
-
-        return QuanticBezierCurve(p0, c0, c1, c2, c3, p1)
-
-    #
-    # @staticmethod
-    # def rate_curve(curve):
-    #     length_rate = curve.get_curve_length()
-    #     max_curvature_change_rate = curve.get_max_curvature_change()
-    #     final_rate = length_rate + max_curvature_change_rate
-    #     return final_rate, length_rate, max_curvature_change_rate
 
     @staticmethod
     def rate_curve(curve):
         return curve.get_max_curvature_change() + abs(curve.get_max_curvature())
+        # return curve.get_max_curvature_change() + abs(curve.get_max_curvature()) + curve.get_curve_length()
         # return curve.get_max_curvature_change() + abs(curve.get_average_curvature_change())
         # return abs(curve.get_average_curvature_change())
 
     @staticmethod
-    def random_search(p0, ang0, p1, ang1, res=200):
+    def random_search(p0, ang0, p1, ang1, res=175):
         l = np.linalg.norm(p1 - p0)
 
         random_length = 0.1 * l / sqrt(2)
@@ -459,8 +434,10 @@ class QuanticBezierCurve(BezierCurve):
 
         for i in range(res):
             new_vector_multipler0 = best_vector_multipler0 + uniform(-random_length, random_length)
-            new_c1 = best_c1 + np.array((uniform(-random_length, random_length), uniform(-random_length, random_length)))
-            new_c2 = best_c2 + np.array((uniform(-random_length, random_length), uniform(-random_length, random_length)))
+            new_c1 = best_c1 + np.array(
+                (uniform(-random_length, random_length), uniform(-random_length, random_length)))
+            new_c2 = best_c2 + np.array(
+                (uniform(-random_length, random_length), uniform(-random_length, random_length)))
             new_vector_multipler1 = best_vector_multipler1 + uniform(-random_length, random_length)
             new_curve = QuanticBezierCurve(p0, p0 + new_vector_multipler0 * l * v0, new_c1, new_c2, p1 +
                                            new_vector_multipler1 * l * v1, p1)
@@ -475,32 +452,152 @@ class QuanticBezierCurve(BezierCurve):
         return best_curve
 
     @staticmethod
-    def particle_swarm(p0, ang0, p1, ang1, res=25):
+    def start_curves_particle_swarm(p0, ang0, p1, ang1, res=30):
         curves = []
         l = np.linalg.norm(p1 - p0)
 
-        # random_length = 0.1 * l / sqrt(2)
+        random_lenght_x = []
+        random_lenght_y = []
+
+        if ang0 - ang1 > 0:
+            if p0[0] < p1[0] and p0[1] < p1[1]:
+                random_lenght_x.append(p0[0])
+                random_lenght_x.append(p1[0])
+                random_lenght_y.append(p0[1])
+                random_lenght_y.append(p1[1])
+
+            elif p0[0] > p1[0] and p0[1] < p1[1]:
+                random_lenght_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
+                random_lenght_x.append(p0[0])
+                random_lenght_y.append(p0[1])
+                random_lenght_y.append(p1[1])
+
+            elif p0[0] < p1[0] and p0[1] > p1[1]:
+                random_lenght_x.append(p0[0])
+                random_lenght_x.append(p1[0])
+                random_lenght_y.append(p1[1])
+                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
+
+            elif p0[0] > p1[0] and p0[1] > p1[1]:
+                random_lenght_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
+                random_lenght_x.append(p0[0])
+                random_lenght_y.append(p1[1])
+                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
+
+        elif ang0 - ang1 < 0:
+            if p0[0] < p1[0] and p0[1] < p1[1]:
+                random_lenght_x.append(p0[0])
+                random_lenght_x.append(p1[0] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
+                random_lenght_y.append(p0[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
+                random_lenght_y.append(p1[1])
+
+            elif p0[0] > p1[0] and p0[1] < p1[1]:
+                random_lenght_x.append(p1[0])
+                random_lenght_x.append(p0[0])
+                random_lenght_y.append(p0[1])
+                random_lenght_y.append(p1[1])
+
+            elif p0[0] < p1[0] and p0[1] > p1[1]:
+                random_lenght_x.append(p0[0])
+                random_lenght_x.append(p1[0] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
+                random_lenght_y.append(p1[1])
+                random_lenght_y.append(p0[1])
+
+            elif p0[0] > p1[0] and p0[1] > p1[1]:
+                random_lenght_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
+                random_lenght_x.append(p0[0])
+                random_lenght_y.append(p1[1])
+                random_lenght_y.append(p0[1])
+
+        elif ang0 == ang1:
+            if p0[0] < p1[0] and p0[1] < p1[1]:
+                random_lenght_x.append(p0[0])
+                random_lenght_x.append(p1[0])
+                random_lenght_y.append(p0[1])
+                random_lenght_y.append(p1[1])
+
+            elif p0[0] < p1[0] and p0[1] > p1[1]:
+                random_lenght_x.append(p0[0])
+                random_lenght_x.append(p1[0])
+                random_lenght_y.append(p1[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
+                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
+
+            elif p0[0] > p1[0] and p0[1] < p1[1]:
+                random_lenght_x.append(p1[0])
+                random_lenght_x.append(p0[0])
+                random_lenght_y.append(p0[1])
+                random_lenght_y.append(p1[1])
+
+            elif p0[0] > p1[0] and p0[1] > p1[1]:
+                random_lenght_x.append(p1[0])
+                random_lenght_x.append(p0[0])
+                random_lenght_y.append(p1[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
+                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
 
         v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
         v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
 
-        best_rate = 9999
-        best_curve_place = 0
-
         for i in range(0, res, 1):
-            u0 = uniform()
-            u1 = uniform()
+            u0 = uniform(0.0, random_lenght_x[1] - random_lenght_x[0])
+            u1 = uniform(0.0, random_lenght_x[1] - random_lenght_x[0])
 
             c0 = p0 + u0 * v0
-            c1 = np.array([uniform(), uniform()])
-            c2 = np.array([uniform(), uniform()])
+            c1 = np.array([uniform(random_lenght_x[0], random_lenght_x[1]), uniform(random_lenght_y[0],
+                                                                                    random_lenght_y[1])])
+            c2 = np.array([uniform(random_lenght_x[0], random_lenght_x[1]), uniform(random_lenght_y[0],
+                                                                                    random_lenght_y[1])])
             c3 = p1 - u1 * v1
             curves.append(QuanticBezierCurve(p0, c0, c1, c2, c3, p1))
+
+        return curves
+
+    @staticmethod
+    def particle_swarm(curves, ang0, ang1, a, b, res=5):
+        # list_curves = [curves]
+
+        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
+        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
+
+        best_rate = 9999.0
+
+        best_curve = None
+
+        for i in range(len(curves)):
             new_rate = curves[i].rate_curve(curves[i])
             if best_rate > new_rate:
                 best_rate = new_rate
-                best_curve_place = i
+                best_curve = curves[i]
 
+        # for i in range(res):
+        for j in range(0, len(curves), 1):
+            if best_curve != curves[j]:
+                random_length_c0 = (best_curve.c0 - best_curve.p0) / v0 - (curves[j].c0 - curves[j].p0) / v0
+                random_length_c1_x = best_curve.c1[0] - curves[j].c1[0]
+                random_length_c1_y = best_curve.c1[1] - curves[j].c1[1]
+                random_length_c2_x = best_curve.c2[0] - curves[j].c2[0]
+                random_length_c2_y = best_curve.c2[1] - curves[j].c2[1]
+                random_length_c3 = (best_curve.p1 - best_curve.c3) / v1 - (curves[j].p1 - curves[j].c3) / v1
+
+                plus_c0 = uniform(random_length_c0 * a, random_length_c0 * b) * v0
+                plus_c1 = np.array([uniform(random_length_c1_x * a, random_length_c1_x * b),
+                                    uniform(random_length_c1_y * a, random_length_c1_y * b)])
+                plus_c2 = np.array([uniform(random_length_c2_x * a, random_length_c2_x * b),
+                                    uniform(random_length_c2_y * a, random_length_c2_y * b)])
+                plus_c3 = uniform(random_length_c3 * a, random_length_c3 * b) * v1
+
+                curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
+                                               curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
+                                               curves[j].p1)
+                new_rate = curves[j].rate_curve(curves[j])
+
+                if best_rate > new_rate:
+                    best_rate = new_rate
+                    best_curve = curves[j]
+
+            # list_curves.append(curves)
+
+        # plt.show()
+        return curves  # , best_curve
 
     @staticmethod
     def connect_curve(curve, q3, ang2):
