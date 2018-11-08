@@ -1,3 +1,4 @@
+from random import *
 from __builtin__ import xrange
 
 import numpy as np
@@ -6,11 +7,10 @@ import matplotlib.pyplot as plt
 
 from math import *
 
-from numpy.f2py.auxfuncs import throw_error
+from matplotlib.lines import Line2D
 from pyparsing import range
 
 from trajectory import *
-from random import *
 from progress.bar import Bar
 
 
@@ -134,10 +134,10 @@ class BezierCurve(object):
 
     def get_setpoints(self, arc_length, start_poistion=0, step=0.0000025):
         """
-        return a list of Setpoints, one arc_length apart from each other
-        :param arc_length:
-        :return:
-        """
+                                return a list of Setpoints, one arc_length apart from each other
+                                :param arc_length:
+                                :return:
+                                """
         p0 = self(0)
         last_curvature = 0
         position = start_poistion
@@ -234,23 +234,32 @@ class CubicBezierCurve(BezierCurve):
         Q = CubicBezierCurve(curve.p1, q1, q2, q3)
         return Q
 
-
-def __str__(self):
-    return 'p0- {} \nc0- {} \nc1- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.p1,
-                                                                  self.get_curve_length())
+    def __str__(self):
+        return 'p0- {} \nc0- {} \nc1- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.p1,
+                                                                      self.get_curve_length())
 
 
 class BezierPath(object):
     def __init__(self, *curves):
         self.curves = curves
+        self.first_curves = curves
+        # print self.curves
         self.max_v = 2
         self.max_a = 2
-        self.points = []
-        self.fig = plt.subplot()
-        self.ax = plt.subplot()
-        self.mat, = self.ax.plot(0, 0)
-        self.figr = plt.figure()
-        # self.plots = [plt.plot([], [])[0] for _ in range(len(self.curves))]
+        self.counter = 1
+        self.counter1 = 0
+        self.list_curves_x = [[]]
+        self.list_curves_y = [[]]
+        self.fig = plt.figure()
+        # self.xdata, self.ydata = [], []
+        # self.points = []
+        # self.fig = plt.figure()
+        self.plots = []
+        for j in range(0, len(self.curves[0]), 1):
+            self.plots.append([plt.plot([], [])[0] for _ in range(len(self.curves[0]))])
+        self.patches = self.plots[0] + self.plots[1]
+        # for j in range(2, len(self.curves[0]), 1):
+        #     self.patches += self.plots[j]
 
     # first argument is t, second argument is curve number
     def __call__(self, *args, **kwaergs):
@@ -258,37 +267,30 @@ class BezierPath(object):
         s = args[2]
         seg = args[1]
         # print 'seg={}   cur/ves seg - {}'.format(seg, self.curves[seg])
-        return self.curves[0][s][seg](t)
+        return self.curves[self.counter1][seg](t)
 
     def get_angle(self, t, seg):
-        return self.curves[0][seg].get_angle(t)
+        return self.curves[self.counter1][seg].get_angle(t)
 
     def draw_path(self, res=1000.0):
         x_list = []
-        x_list0 = []
         y_list = []
-        y_list0 = []
         # ax = plt.axes(xlim=(0, 2), ylim=(0, 100))
-        for j in xrange(0, len(self.curves)):
-            for s in xrange(0, len(self.curves[j])):
-                for t in xrange(0, int(res + 1)):
-                    # print self.get_angle(t / res, s)
-                    x_list.append(self(t / res, s, j)[0])
-                    x_list0.append(self(t / res, s, j)[0])
-                    y_list.append(self(t / res, s, j)[1])
-                    y_list0.append(self(t / res, s, j)[1])
+        # for j in xrange(0, len(self.curves)):
+        for s in xrange(0, len(self.curves[0])):
+            for t in xrange(0, int(res + 1)):
+                # print self.get_angle(t / res, s)
+                x_list.append(self(t / res, s, 0)[0])
+                y_list.append(self(t / res, s, 0)[1])
 
-                plt.plot(x_list, y_list)
-                x_list = []
-                y_list = []
+            plt.plot(x_list, y_list)
+            x_list = []
+            y_list = []
 
-        self.mat, = self.ax.plot(x_list0, y_list0)
-
-        # plt.axes().set_aspect('equal', 'datalim')
-        plt.subplot().axis([0, 3, 2, 3])
+        plt.axes().set_aspect('equal', 'datalim')
         # plt.plot(x_list, y_list)
 
-        ani = self.animation_draw()
+        # ani = self.animation_draw()
         plt.show()
 
     def get_setpoints(self, arc_length=0.00005):
@@ -299,54 +301,86 @@ class BezierPath(object):
             start_position += l[-1].p
         return l
 
-    def adnve(self, curves, res=1000.0):
-        newstatus = set()
-        list_x = []
-        list_y = []
-        for s in xrange(0, len(curves), 1):
-            for i in xrange(0, int(res), 1):
-                list_x.append(self(i / res, s, 0)[0] + 1)
-                list_y.append(self(i / res, s, 0)[1] + 1)
-        newstatus = [list_x, list_y]
-        return newstatus
-
-    def animate(self, i):
+    def animate_init(self):
         res = 1000.0
-        # update plots
-        self.points = [0, 0]
-
-        print i
-
         x_list = []
         y_list = []
+        for s in xrange(0, len(self.plots), 1):
+            for t in xrange(0, int(res + 1), 1):
+                # print self.get_angle(t / res, s)
+                x_list.append(self(t / res, s, 0)[0])
+                y_list.append(self(t / res, s, 0)[1])
 
-        self.points[0] = self.adnve(self.curves[0][0])[0]
-        self.points[1] = self.adnve(self.curves[0][0])[1]
+            for plot in self.plots[s]:
+                plot.set_data([], [])
+        # for t in xrange(0, int(res + 1), 1):
+        #     x_list.append(self(t / res, 0, 0)[0])
+        #     y_list.append(self(t / res, 0, 0)[1])
+        #
+        # for plot in self.plots[0]:
+        #     plot.set_data(x_list, y_list)
+        #
+        # x_list = []
+        # y_list = []
+        #
+        # for t in xrange(0, int(res + 1), 1):
+        #     x_list.append(self(t / res, 1, 0)[0])
+        #     y_list.append(self(t / res, 1, 0)[1])
+        #
+        # for plot in self.plots[1]:
+        #     plot.set_data(x_list, y_list)
 
+        # for plot in self.plots[s]:
+        #     plot.set_data(x_list, y_list)
+        # self.curves = [Optimization.particle_swarm(self.curves[0], 90, 90)]
 
-        # self.curves[0] = curves
-
-    # for j in xrange(0, len(self.curves)):
-    #     for s in xrange(0, len(self.curves[0])):
-    #         for t in xrange(0, int(res + 1)):
-    #             # print self.get_angle(t / res, s)
-    #             x_list.append(self(t / res, s, 0)[0])
-    #             y_list.append(self(t / res, s, 0)[1])
-    #
-    #         self.points.append([x_list, y_list])
-    #         x_list = []
-    #         y_list = []
-
-        x = zip(np.itertools.repeat(float(0), len(self.points)), self.points)
-        y = zip(np.itertools.repeat(float(1), len(self.points)), self.points)
-        self.mat.set_data(x, y)
-
-        return self.mat,
+        return self.patches
 
     def animation_draw(self):
-        ani = animation.FuncAnimation(self.figr, self.animate, interval=500)
-        # plt.show()
-        return ani
+        plt.subplot().axis([0, 3, 2, 3])
+        ani = animation.FuncAnimation(self.fig, self.animate, init_func=self.animate_init, frames=100, interval=50,
+                                      blit=True)
+        plt.show()
+        # return ani
+
+    def animate(self, i):
+        if self.counter > 10:
+            for s in range(0, len(self.curves[0]), 1):
+                self.curves[0][s] = Optimization.particle_swarm(self.curves[0], 90, 90)[s]
+            self.counter += 1
+        else:
+            self.curves = self.first_curves
+        res = 1000.0
+        x_list = []
+        y_list = []
+        for s in xrange(0, len(self.plots), 1):
+            for j, plot in enumerate(self.plots[s]):
+                for t in xrange(0, int(res + 1), 1):
+                    # print self.get_angle(t / res, s)
+                    x_list.append(self(t / res, s, 0)[0])
+                    y_list.append(self(t / res, s, 0)[1])
+                plot.set_data(x_list, y_list)
+                x_list = []
+                y_list = []
+        #
+        # for t in xrange(0, int(res + 1), 1):
+        #     x_list.append(self(t / res, 0, 0)[0])
+        #     y_list.append(self(t / res, 0, 0)[1])
+        #
+        # for plot in self.plots[0]:
+        #     plot.set_data(x_list, y_list)
+        #
+        # x_list = []
+        # y_list = []
+        #
+        # for t in xrange(0, int(res + 1), 1):
+        #     x_list.append(self(t / res, 1, 0)[0])
+        #     y_list.append(self(t / res, 1, 0)[1])
+        #
+        # for plot in self.plots[1]:
+        #     plot.set_data(x_list, y_list)
+
+        return self.patches
 
     def __str__(self):
         return self.curves
@@ -403,7 +437,7 @@ class Optimization(object):
         return best_curve
 
     @staticmethod
-    def start_curves_particle_swarm(p0, ang0, p1, ang1, res=2):
+    def start_curves_particle_swarm(p0, ang0, p1, ang1, res=20):
         curves = []
         l = np.linalg.norm(p1 - p0)
 
@@ -503,11 +537,7 @@ class Optimization(object):
         return curves
 
     @staticmethod
-    def particle_swarm(curves, ang0, ang1, a, b, res=5):
-        # list_curves = [curves]
-
-        # path = BezierPath(curves)
-        # path.draw_path()
+    def particle_swarm(curves, ang0, ang1):
 
         v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
         v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
@@ -522,7 +552,7 @@ class Optimization(object):
                 best_rate = new_rate
                 best_curve = curves[i]
 
-    # for i in range(res):
+        # for i in range(res):
         for j in range(0, len(curves), 1):
             if best_curve != curves[j]:
                 random_length_c0 = (best_curve.c0 - best_curve.p0) / v0 - (curves[j].c0 - curves[j].p0) / v0
@@ -530,14 +560,14 @@ class Optimization(object):
                 random_length_c1_y = best_curve.c1[1] - curves[j].c1[1]
                 random_length_c2_x = best_curve.c2[0] - curves[j].c2[0]
                 random_length_c2_y = best_curve.c2[1] - curves[j].c2[1]
-                random_length_c3 = (best_curve.p1 - best_curve.c3) / v1 - (curves[j].p1 - curves[j].c3) / v1
+                random_length_c3 = (best_curve.c3 - best_curve.p1) / v1 - (curves[j].c3 - curves[j].p1) / v1
 
-                plus_c0 = uniform(random_length_c0 * a, random_length_c0 * b) * v0
-                plus_c1 = np.array([uniform(random_length_c1_x * a, random_length_c1_x * b),
-                                    uniform(random_length_c1_y * a, random_length_c1_y * b)])
-                plus_c2 = np.array([uniform(random_length_c2_x * a, random_length_c2_x * b),
-                                    uniform(random_length_c2_y * a, random_length_c2_y * b)])
-                plus_c3 = uniform(random_length_c3 * a, random_length_c3 * b) * v1
+                plus_c0 = uniform(random_length_c0 * 0.1, random_length_c0 * 0.375) * v0
+                plus_c1 = np.array([uniform(random_length_c1_x * 0.1, random_length_c1_x * 0.375),
+                                    uniform(random_length_c1_y * 0.1, random_length_c1_y * 0.375)])
+                plus_c2 = np.array([uniform(random_length_c2_x * 0.1, random_length_c2_x * 0.375),
+                                    uniform(random_length_c2_y * 0.1, random_length_c2_y * 0.375)])
+                plus_c3 = uniform(random_length_c3 * 0.1, random_length_c3 * 0.375) * v1
 
                 curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
                                                curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
@@ -553,17 +583,6 @@ class Optimization(object):
 
         # plt.show()
         return curves  # , best_curve
-
-    @staticmethod
-    def particle(curves, ang0, ang1, a, b, res=1):
-        list_curves = []#[curves]
-        for i in range(1, res, 1):
-            list_curves.append(Optimization.particle_swarm(list_curves[i-1], ang0, ang1, a, b))
-
-        print list_curves
-        # path = BezierPath(list_curves)
-        # path.draw_path()
-        return list_curves
 
     def __str__(self):
         return self.curve
