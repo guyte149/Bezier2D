@@ -255,9 +255,9 @@ class BezierPath(object):
         # self.points = []
         # self.fig = plt.figure()
         self.plots = []
-        for j in range(0, len(self.curves[0]), 1):
-            self.plots.append([plt.plot([], [])[0] for _ in range(len(self.curves[0]))])
-        self.patches = self.plots[0] + self.plots[1]
+        # for j in range(0, len(self.curves[0]), 1):
+        #     self.plots.append([plt.plot([], [])[0] for _ in range(len(self.curves[0]))])
+        # self.patches = self.plots[0] + self.plots[1]
         # for j in range(2, len(self.curves[0]), 1):
         #     self.patches += self.plots[j]
 
@@ -267,7 +267,7 @@ class BezierPath(object):
         s = args[2]
         seg = args[1]
         # print 'seg={}   cur/ves seg - {}'.format(seg, self.curves[seg])
-        return self.curves[self.counter1][seg](t)
+        return self.curves[0][seg](t)
 
     def get_angle(self, t, seg):
         return self.curves[self.counter1][seg].get_angle(t)
@@ -384,208 +384,6 @@ class BezierPath(object):
 
     def __str__(self):
         return self.curves
-
-
-class Optimization(object):
-    def __init__(self):
-        pass
-
-    def __call__(self, *args, **kwargs):
-        t = args[0]
-        return self.curve(t)
-
-    @staticmethod
-    def random_search(p0, ang0, p1, ang1, res=175):
-        l = np.linalg.norm(p1 - p0)
-
-        random_length = 0.1 * l / sqrt(2)
-
-        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
-        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
-
-        best_vector_multipler0 = 0.275
-        best_vector_multipler1 = -0.275
-
-        c0 = p0 + best_vector_multipler0 * v0
-        c3 = p1 + best_vector_multipler1 * v1
-
-        value_x = (p1[0] - p0[0]) * 0.25
-
-        best_c1 = np.array([c0[0] + value_x, c0[1] + c0[1] * l / (l * l)])
-        best_c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / (l * l)])
-
-        best_curve = QuanticBezierCurve(p0, c0, best_c1, best_c2, c3, p1)
-        best_rate = QuanticBezierCurve.rate_curve(best_curve)
-
-        for i in range(res):
-            new_vector_multipler0 = best_vector_multipler0 + uniform(-random_length, random_length)
-            new_c1 = best_c1 + np.array(
-                (uniform(-random_length, random_length), uniform(-random_length, random_length)))
-            new_c2 = best_c2 + np.array(
-                (uniform(-random_length, random_length), uniform(-random_length, random_length)))
-            new_vector_multipler1 = best_vector_multipler1 + uniform(-random_length, random_length)
-            new_curve = QuanticBezierCurve(p0, p0 + new_vector_multipler0 * l * v0, new_c1, new_c2, p1 +
-                                           new_vector_multipler1 * l * v1, p1)
-            new_rate = QuanticBezierCurve.rate_curve(new_curve)
-            if 0 < new_rate < best_rate and new_vector_multipler0 > 0 > new_vector_multipler1:
-                best_vector_multipler0 = new_vector_multipler0
-                best_vector_multipler1 = new_vector_multipler1
-                best_c1 = new_c1
-                best_c2 = new_c2
-                best_rate = new_rate
-                best_curve = new_curve
-        return best_curve
-
-    @staticmethod
-    def start_curves_particle_swarm(p0, ang0, p1, ang1, res=20):
-        curves = []
-        l = np.linalg.norm(p1 - p0)
-
-        random_lenght_x = []
-        random_lenght_y = []
-
-        if ang0 - ang1 > 0:
-            if p0[0] < p1[0] and p0[1] < p1[1]:
-                random_lenght_x.append(p0[0])
-                random_lenght_x.append(p1[0])
-                random_lenght_y.append(p0[1])
-                random_lenght_y.append(p1[1])
-
-            elif p0[0] > p1[0] and p0[1] < p1[1]:
-                random_lenght_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
-                random_lenght_x.append(p0[0])
-                random_lenght_y.append(p0[1])
-                random_lenght_y.append(p1[1])
-
-            elif p0[0] < p1[0] and p0[1] > p1[1]:
-                random_lenght_x.append(p0[0])
-                random_lenght_x.append(p1[0])
-                random_lenght_y.append(p1[1])
-                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
-
-            elif p0[0] > p1[0] and p0[1] > p1[1]:
-                random_lenght_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
-                random_lenght_x.append(p0[0])
-                random_lenght_y.append(p1[1])
-                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
-
-        elif ang0 - ang1 < 0:
-            if p0[0] < p1[0] and p0[1] < p1[1]:
-                random_lenght_x.append(p0[0])
-                random_lenght_x.append(p1[0] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
-                random_lenght_y.append(p0[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
-                random_lenght_y.append(p1[1])
-
-            elif p0[0] > p1[0] and p0[1] < p1[1]:
-                random_lenght_x.append(p1[0])
-                random_lenght_x.append(p0[0])
-                random_lenght_y.append(p0[1])
-                random_lenght_y.append(p1[1])
-
-            elif p0[0] < p1[0] and p0[1] > p1[1]:
-                random_lenght_x.append(p0[0])
-                random_lenght_x.append(p1[0] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
-                random_lenght_y.append(p1[1])
-                random_lenght_y.append(p0[1])
-
-            elif p0[0] > p1[0] and p0[1] > p1[1]:
-                random_lenght_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
-                random_lenght_x.append(p0[0])
-                random_lenght_y.append(p1[1])
-                random_lenght_y.append(p0[1])
-
-        elif ang0 == ang1:
-            if p0[0] < p1[0] and p0[1] < p1[1]:
-                random_lenght_x.append(p0[0])
-                random_lenght_x.append(p1[0])
-                random_lenght_y.append(p0[1])
-                random_lenght_y.append(p1[1])
-
-            elif p0[0] < p1[0] and p0[1] > p1[1]:
-                random_lenght_x.append(p0[0])
-                random_lenght_x.append(p1[0])
-                random_lenght_y.append(p1[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
-                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
-
-            elif p0[0] > p1[0] and p0[1] < p1[1]:
-                random_lenght_x.append(p1[0])
-                random_lenght_x.append(p0[0])
-                random_lenght_y.append(p0[1])
-                random_lenght_y.append(p1[1])
-
-            elif p0[0] > p1[0] and p0[1] > p1[1]:
-                random_lenght_x.append(p1[0])
-                random_lenght_x.append(p0[0])
-                random_lenght_y.append(p1[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
-                random_lenght_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
-
-        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
-        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
-
-        for i in range(0, res, 1):
-            u0 = uniform(0.0, random_lenght_x[1] - random_lenght_x[0])
-            u1 = uniform(0.0, random_lenght_x[1] - random_lenght_x[0])
-
-            c0 = p0 + u0 * v0
-            c1 = np.array([uniform(random_lenght_x[0], random_lenght_x[1]), uniform(random_lenght_y[0],
-                                                                                    random_lenght_y[1])])
-            c2 = np.array([uniform(random_lenght_x[0], random_lenght_x[1]), uniform(random_lenght_y[0],
-                                                                                    random_lenght_y[1])])
-            c3 = p1 - u1 * v1
-            curves.append(QuanticBezierCurve(p0, c0, c1, c2, c3, p1))
-
-        return curves
-
-    @staticmethod
-    def particle_swarm(curves, ang0, ang1):
-
-        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
-        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
-
-        best_rate = 9999.0
-
-        best_curve = None
-
-        for i in range(len(curves)):
-            new_rate = curves[i].rate_curve(curves[i])
-            if best_rate > new_rate:
-                best_rate = new_rate
-                best_curve = curves[i]
-
-        # for i in range(res):
-        for j in range(0, len(curves), 1):
-            if best_curve != curves[j]:
-                random_length_c0 = (best_curve.c0 - best_curve.p0) / v0 - (curves[j].c0 - curves[j].p0) / v0
-                random_length_c1_x = best_curve.c1[0] - curves[j].c1[0]
-                random_length_c1_y = best_curve.c1[1] - curves[j].c1[1]
-                random_length_c2_x = best_curve.c2[0] - curves[j].c2[0]
-                random_length_c2_y = best_curve.c2[1] - curves[j].c2[1]
-                random_length_c3 = (best_curve.c3 - best_curve.p1) / v1 - (curves[j].c3 - curves[j].p1) / v1
-
-                plus_c0 = uniform(random_length_c0 * 0.1, random_length_c0 * 0.375) * v0
-                plus_c1 = np.array([uniform(random_length_c1_x * 0.1, random_length_c1_x * 0.375),
-                                    uniform(random_length_c1_y * 0.1, random_length_c1_y * 0.375)])
-                plus_c2 = np.array([uniform(random_length_c2_x * 0.1, random_length_c2_x * 0.375),
-                                    uniform(random_length_c2_y * 0.1, random_length_c2_y * 0.375)])
-                plus_c3 = uniform(random_length_c3 * 0.1, random_length_c3 * 0.375) * v1
-
-                curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
-                                               curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
-                                               curves[j].p1)
-                new_rate = curves[j].rate_curve(curves[j])
-
-                if best_rate > new_rate:
-                    best_rate = new_rate
-                    best_curve = curves[j]
-        # list_curves.append(curves)
-        # path = BezierPath(curves)
-        # path.draw_path()
-
-        # plt.show()
-        return curves  # , best_curve
-
-    def __str__(self):
-        return self.curve
 
 
 class QuanticBezierCurve(BezierCurve):
