@@ -13,13 +13,13 @@ ang2 = 0
 # for i in range(5):
 #     c1 = Optimization.random_search(p0, ang0, p1, ang1)
 #     c2.append(c1)
-c1 = ParticleSwarm.last_curves(p0, ang0, p1, ang1)
+c1 = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)
 # print c1
 # path = BezierPath([c1[0], c1[1], c1[2], c1[3], c1[4s]])
 # for i in range(15):
-path = BezierPath(c1())
-# path.animation_draw()
-path.draw_path()
+path = BezierPath([c1])
+path.display()
+# path.draw_path()
 #     c1 = Optimization.particle_swarm(c1, ang0, ang1)
 # c1 = [QuanticBezierCurve.random_search(p0, ang0, p1, ang1)]
 # c1 = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)

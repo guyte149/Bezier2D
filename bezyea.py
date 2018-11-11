@@ -246,14 +246,11 @@ class BezierPath(object):
         # print self.curves
         self.max_v = 2
         self.max_a = 2
-        self.counter = 1
-        self.counter1 = 0
-        self.list_curves_x = [[]]
-        self.list_curves_y = [[]]
+        # First set up the figure, the axis, and the plot element we want to animate
         self.fig = plt.figure()
-        # self.xdata, self.ydata = [], []
-        # self.points = []
-        # self.fig = plt.figure()
+        self.ax = plt.axes(xlim=(-0.5, 2), ylim=(-0.5, 2))
+        # self.ax = plt.axes().set_aspect('equal', 'datalim')
+        self.line, = self.ax.plot([], [], lw=2)
         self.plots = []
         # for j in range(0, len(self.curves[0]), 1):
         #     self.plots.append([plt.plot([], [])[0] for _ in range(len(self.curves[0]))])
@@ -301,86 +298,34 @@ class BezierPath(object):
             start_position += l[-1].p
         return l
 
-    def animate_init(self):
-        res = 1000.0
-        x_list = []
-        y_list = []
-        for s in xrange(0, len(self.plots), 1):
-            for t in xrange(0, int(res + 1), 1):
-                # print self.get_angle(t / res, s)
-                x_list.append(self(t / res, s, 0)[0])
-                y_list.append(self(t / res, s, 0)[1])
+    # initialization function: plot the background of each frame
+    def init(self):
+        self.line.set_data([], [])
+        return self.line,
 
-            for plot in self.plots[s]:
-                plot.set_data([], [])
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 0, 0)[0])
-        #     y_list.append(self(t / res, 0, 0)[1])
-        #
-        # for plot in self.plots[0]:
-        #     plot.set_data(x_list, y_list)
-        #
-        # x_list = []
-        # y_list = []
-        #
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 1, 0)[0])
-        #     y_list.append(self(t / res, 1, 0)[1])
-        #
-        # for plot in self.plots[1]:
-        #     plot.set_data(x_list, y_list)
-
-        # for plot in self.plots[s]:
-        #     plot.set_data(x_list, y_list)
-        # self.curves = [Optimization.particle_swarm(self.curves[0], 90, 90)]
-
-        return self.patches
-
-    def animation_draw(self):
-        plt.subplot().axis([0, 3, 2, 3])
-        ani = animation.FuncAnimation(self.fig, self.animate, init_func=self.animate_init, frames=100, interval=50,
-                                      blit=True)
-        plt.show()
-        # return ani
-
+    # animation function.  This is called sequentially
     def animate(self, i):
-        if self.counter > 10:
-            for s in range(0, len(self.curves[0]), 1):
-                self.curves[0][s] = Optimization.particle_swarm(self.curves[0], 90, 90)[s]
-            self.counter += 1
-        else:
-            self.curves = self.first_curves
-        res = 1000.0
+
         x_list = []
         y_list = []
-        for s in xrange(0, len(self.plots), 1):
-            for j, plot in enumerate(self.plots[s]):
-                for t in xrange(0, int(res + 1), 1):
-                    # print self.get_angle(t / res, s)
-                    x_list.append(self(t / res, s, 0)[0])
-                    y_list.append(self(t / res, s, 0)[1])
-                plot.set_data(x_list, y_list)
-                x_list = []
-                y_list = []
-        #
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 0, 0)[0])
-        #     y_list.append(self(t / res, 0, 0)[1])
-        #
-        # for plot in self.plots[0]:
-        #     plot.set_data(x_list, y_list)
-        #
-        # x_list = []
-        # y_list = []
-        #
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 1, 0)[0])
-        #     y_list.append(self(t / res, 1, 0)[1])
-        #
-        # for plot in self.plots[1]:
-        #     plot.set_data(x_list, y_list)
+        s = 0
+        t_list = np.linspace(0.0, 1.0, 1000.0)
 
-        return self.patches
+        for t in t_list:
+            # print self.get_angle(t / res, s)
+            x_list.append(self(t, s, 0)[0])
+            y_list.append(self(t, s, 0)[1])
+
+        self.line.set_data(x_list, y_list)
+        # self.line.set_data(x, y)
+        return self.line,
+
+    def display(self):
+        # call the animator.  blit=True means only re-draw the parts that have changed.
+        anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init,
+                                       frames=200, interval=20, blit=True)
+
+        plt.show()
 
     def __str__(self):
         return self.curves
