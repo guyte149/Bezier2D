@@ -13,7 +13,6 @@ from pyparsing import range
 from trajectory import *
 from progress.bar import Bar
 
-
 class BezierCurve(object):
     def __init__(self, p0, p1):
         self.p0 = p0
@@ -246,12 +245,7 @@ class BezierPath(object):
         # print self.curves
         self.max_v = 2
         self.max_a = 2
-        # First set up the figure, the axis, and the plot element we want to animate
-        self.fig = plt.figure()
-        self.ax = plt.axes(xlim=(-0.5, 2), ylim=(-0.5, 2))
-        # self.ax = plt.axes().set_aspect('equal', 'datalim')
-        self.line, = self.ax.plot([], [], lw=2)
-        self.plots = []
+
         # for j in range(0, len(self.curves[0]), 1):
         #     self.plots.append([plt.plot([], [])[0] for _ in range(len(self.curves[0]))])
         # self.patches = self.plots[0] + self.plots[1]
@@ -259,7 +253,7 @@ class BezierPath(object):
         #     self.patches += self.plots[j]
 
     # first argument is t, second argument is curve number
-    def __call__(self, *args, **kwaergs):
+    def __call__(self, *args, **kwargs):
         t = args[0]
         s = args[2]
         seg = args[1]
@@ -272,11 +266,9 @@ class BezierPath(object):
     def draw_path(self, res=1000.0):
         x_list = []
         y_list = []
-        # ax = plt.axes(xlim=(0, 2), ylim=(0, 100))
-        # for j in xrange(0, len(self.curves)):
+
         for s in xrange(0, len(self.curves[0])):
             for t in xrange(0, int(res + 1)):
-                # print self.get_angle(t / res, s)
                 x_list.append(self(t / res, s, 0)[0])
                 y_list.append(self(t / res, s, 0)[1])
 
@@ -285,9 +277,7 @@ class BezierPath(object):
             y_list = []
 
         plt.axes().set_aspect('equal', 'datalim')
-        # plt.plot(x_list, y_list)
 
-        # ani = self.animation_draw()
         plt.show()
 
     def get_setpoints(self, arc_length=0.00005):
@@ -297,35 +287,6 @@ class BezierPath(object):
             l = l + c.get_setpoints(arc_length, start_position)
             start_position += l[-1].p
         return l
-
-    # initialization function: plot the background of each frame
-    def init(self):
-        self.line.set_data([], [])
-        return self.line,
-
-    # animation function.  This is called sequentially
-    def animate(self, i):
-
-        x_list = []
-        y_list = []
-        s = 0
-        t_list = np.linspace(0.0, 1.0, 1000.0)
-
-        for t in t_list:
-            # print self.get_angle(t / res, s)
-            x_list.append(self(t, s, 0)[0])
-            y_list.append(self(t, s, 0)[1])
-
-        self.line.set_data(x_list, y_list)
-        # self.line.set_data(x, y)
-        return self.line,
-
-    def display(self):
-        # call the animator.  blit=True means only re-draw the parts that have changed.
-        anim = animation.FuncAnimation(self.fig, self.animate, init_func=self.init,
-                                       frames=200, interval=20, blit=True)
-
-        plt.show()
 
     def __str__(self):
         return self.curves
