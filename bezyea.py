@@ -13,7 +13,6 @@ from pyparsing import range
 from trajectory import *
 from progress.bar import Bar
 
-
 class BezierCurve(object):
     def __init__(self, p0, p1):
         self.p0 = p0
@@ -246,15 +245,7 @@ class BezierPath(object):
         # print self.curves
         self.max_v = 2
         self.max_a = 2
-        self.counter = 1
-        self.counter1 = 0
-        self.list_curves_x = [[]]
-        self.list_curves_y = [[]]
-        self.fig = plt.figure()
-        # self.xdata, self.ydata = [], []
-        # self.points = []
-        # self.fig = plt.figure()
-        self.plots = []
+
         # for j in range(0, len(self.curves[0]), 1):
         #     self.plots.append([plt.plot([], [])[0] for _ in range(len(self.curves[0]))])
         # self.patches = self.plots[0] + self.plots[1]
@@ -262,7 +253,7 @@ class BezierPath(object):
         #     self.patches += self.plots[j]
 
     # first argument is t, second argument is curve number
-    def __call__(self, *args, **kwaergs):
+    def __call__(self, *args, **kwargs):
         t = args[0]
         s = args[2]
         seg = args[1]
@@ -275,11 +266,9 @@ class BezierPath(object):
     def draw_path(self, res=1000.0):
         x_list = []
         y_list = []
-        # ax = plt.axes(xlim=(0, 2), ylim=(0, 100))
-        # for j in xrange(0, len(self.curves)):
+
         for s in xrange(0, len(self.curves[0])):
             for t in xrange(0, int(res + 1)):
-                # print self.get_angle(t / res, s)
                 x_list.append(self(t / res, s, 0)[0])
                 y_list.append(self(t / res, s, 0)[1])
 
@@ -288,9 +277,7 @@ class BezierPath(object):
             y_list = []
 
         plt.axes().set_aspect('equal', 'datalim')
-        # plt.plot(x_list, y_list)
 
-        # ani = self.animation_draw()
         plt.show()
 
     def get_setpoints(self, arc_length=0.00005):
@@ -300,87 +287,6 @@ class BezierPath(object):
             l = l + c.get_setpoints(arc_length, start_position)
             start_position += l[-1].p
         return l
-
-    def animate_init(self):
-        res = 1000.0
-        x_list = []
-        y_list = []
-        for s in xrange(0, len(self.plots), 1):
-            for t in xrange(0, int(res + 1), 1):
-                # print self.get_angle(t / res, s)
-                x_list.append(self(t / res, s, 0)[0])
-                y_list.append(self(t / res, s, 0)[1])
-
-            for plot in self.plots[s]:
-                plot.set_data([], [])
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 0, 0)[0])
-        #     y_list.append(self(t / res, 0, 0)[1])
-        #
-        # for plot in self.plots[0]:
-        #     plot.set_data(x_list, y_list)
-        #
-        # x_list = []
-        # y_list = []
-        #
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 1, 0)[0])
-        #     y_list.append(self(t / res, 1, 0)[1])
-        #
-        # for plot in self.plots[1]:
-        #     plot.set_data(x_list, y_list)
-
-        # for plot in self.plots[s]:
-        #     plot.set_data(x_list, y_list)
-        # self.curves = [Optimization.particle_swarm(self.curves[0], 90, 90)]
-
-        return self.patches
-
-    def animation_draw(self):
-        plt.subplot().axis([0, 3, 2, 3])
-        ani = animation.FuncAnimation(self.fig, self.animate, init_func=self.animate_init, frames=100, interval=50,
-                                      blit=True)
-        plt.show()
-        # return ani
-
-    def animate(self, i):
-        if self.counter > 10:
-            for s in range(0, len(self.curves[0]), 1):
-                self.curves[0][s] = Optimization.particle_swarm(self.curves[0], 90, 90)[s]
-            self.counter += 1
-        else:
-            self.curves = self.first_curves
-        res = 1000.0
-        x_list = []
-        y_list = []
-        for s in xrange(0, len(self.plots), 1):
-            for j, plot in enumerate(self.plots[s]):
-                for t in xrange(0, int(res + 1), 1):
-                    # print self.get_angle(t / res, s)
-                    x_list.append(self(t / res, s, 0)[0])
-                    y_list.append(self(t / res, s, 0)[1])
-                plot.set_data(x_list, y_list)
-                x_list = []
-                y_list = []
-        #
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 0, 0)[0])
-        #     y_list.append(self(t / res, 0, 0)[1])
-        #
-        # for plot in self.plots[0]:
-        #     plot.set_data(x_list, y_list)
-        #
-        # x_list = []
-        # y_list = []
-        #
-        # for t in xrange(0, int(res + 1), 1):
-        #     x_list.append(self(t / res, 1, 0)[0])
-        #     y_list.append(self(t / res, 1, 0)[1])
-        #
-        # for plot in self.plots[1]:
-        #     plot.set_data(x_list, y_list)
-
-        return self.patches
 
     def __str__(self):
         return self.curves

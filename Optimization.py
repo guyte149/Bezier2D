@@ -93,7 +93,7 @@ class ParticleSwarm(Optimization):
         return self.curves
 
     @staticmethod
-    def start_curves(p0, ang0, p1, ang1, res=20):
+    def start_curves(p0, ang0, p1, ang1, res=15):
         curves = []
         l = np.linalg.norm(p1 - p0)
 
