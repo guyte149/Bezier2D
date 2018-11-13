@@ -282,5 +282,177 @@ class ParticleSwarm(Optimization):
 
         return ParticleSwarm(p0, p1, best_curve, curves[0], curves[res - 1])
 
+    @staticmethod
+    def start_curves_connect(curve, ang1, p2, ang2, res=15):
+        curves = []
+        l = np.linalg.norm(p2 - curve.p1)
+
+        random_length_x = []
+        random_length_y = []
+
+        if ang1 - ang2 > 0:
+            if curve.p1[0] < p2[0] and curve.p1[1] < p2[1]:
+                random_length_x.append(curve.p1[0])
+                random_length_x.append(p2[0])
+                random_length_y.append(curve.p1[1])
+                random_length_y.append(p2[1])
+
+            elif curve.p1[0] > p2[0] and curve.p1[1] < p2[1]:
+                random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_x.append(curve.p1[0])
+                random_length_y.append(curve.p1[1])
+                random_length_y.append(p2[1])
+
+            elif curve.p1[0] < p2[0] and curve.p1[1] > p2[1]:
+                random_length_x.append(curve.p1[0])
+                random_length_x.append(p2[0])
+                random_length_y.append(p2[1])
+                random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
+
+            elif curve.p1[0] > p2[0] and curve.p1[1] > p2[1]:
+                random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_x.append(curve.p1[0])
+                random_length_y.append(p2[1])
+                random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
+
+        elif ang1 - ang2 < 0:
+            if curve.p1[0] < p2[0] and curve.p1[1] < p2[1]:
+                random_length_x.append(curve.p1[0])
+                random_length_x.append(p2[0] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
+                random_length_y.append(curve.p1[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_y.append(p2[1])
+
+            elif curve.p1[0] > p2[0] and curve.p1[1] < p2[1]:
+                random_length_x.append(p2[0])
+                random_length_x.append(curve.p1[0])
+                random_length_y.append(curve.p1[1])
+                random_length_y.append(p2[1])
+
+            elif curve.p1[0] < p2[0] and curve.p1[1] > p2[1]:
+                random_length_x.append(curve.p1[0])
+                random_length_x.append(p2[0] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
+                random_length_y.append(p2[1])
+                random_length_y.append(curve.p1[1])
+
+            elif curve.p1[0] > p2[0] and curve.p1[1] > p2[1]:
+                random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_x.append(curve.p1[0])
+                random_length_y.append(p2[1])
+                random_length_y.append(curve.p1[1])
+
+        elif ang1 == ang2:
+            if curve.p1[0] < p2[0] and curve.p1[1] < p2[1]:
+                random_length_x.append(curve.p1[0])
+                random_length_x.append(p2[0])
+                random_length_y.append(curve.p1[1])
+                random_length_y.append(p2[1])
+
+            elif curve.p1[0] < p2[0] and curve.p1[1] > p2[1]:
+                random_length_x.append(curve.p1[0])
+                random_length_x.append(p2[0])
+                random_length_y.append(p2[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
+
+            elif curve.p1[0] > p2[0] and curve.p1[1] < p2[1]:
+                random_length_x.append(p2[0])
+                random_length_x.append(curve.p1[0])
+                random_length_y.append(curve.p1[1])
+                random_length_y.append(p2[1])
+
+            elif curve.p1[0] > p2[0] and curve.p1[1] > p2[1]:
+                random_length_x.append(p2[0])
+                random_length_x.append(curve.p1[0])
+                random_length_y.append(p2[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
+
+        v0 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
+        v1 = np.array([np.cos(np.deg2rad(ang2)), np.sin(np.deg2rad(ang2))])
+
+        min_random_x = random_length_x[0]
+        min_random_y = random_length_y[0]
+        max_random_x = random_length_x[1]
+        max_random_y = random_length_y[1]
+
+        for i in range(0, res, 1):
+            # u0 = ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random())
+            u1 = ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random())
+
+            # c0 = curve.p1 + u0 * v0
+            c0 = 2 * curve.p1 - curve.c3
+            # c1 = np.array([ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random()),
+            #                ParticleSwarm.function_random(min_random_y, max_random_y, np.random.random())])
+            c1 = curve.c2 + 2 * c0 - 2 * curve.c3
+            c2 = np.array([ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random()),
+                           ParticleSwarm.function_random(min_random_y, max_random_y, np.random.random())])
+            c3 = p2 - u1 * v1
+            curves.append(QuanticBezierCurve(curve.p1, c0, c1, c2, c3, p2))
+
+        return curves
+
+    @staticmethod
+    def next_curves_connect(curves, ang1, ang2):
+
+        v0 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
+        v1 = np.array([np.cos(np.deg2rad(ang2)), np.sin(np.deg2rad(ang2))])
+
+        best_rate = 9999.0
+
+        best_curve = None
+
+        for i in range(len(curves)):
+            new_rate = curves[i].rate_curve(curves[i])
+            if best_rate > new_rate:
+                best_rate = new_rate
+                best_curve = curves[i]
+
+        min_random = 0.1
+        max_random = 0.375
+
+        for j in range(0, len(curves), 1):
+            if best_curve != curves[j]:
+                # random_length_c0 = (best_curve.c0 - best_curve.p0) / v0 - (curves[j].c0 - curves[j].p0) / v0
+                # random_length_c1 = best_curve.c1 - curves[j].c1
+                random_length_c2 = best_curve.c2 - curves[j].c2
+                random_length_c3 = (best_curve.c3 - best_curve.p1) / v1 - (curves[j].c3 - curves[j].p1) / v1
+
+                # plus_c0 = ParticleSwarm.function_random(min_random, max_random,
+                #                                         np.random.random()) * random_length_c0 * v0
+                # plus_c1 = np.array([ParticleSwarm.function_random(min_random, max_random, np.random.random()),
+                #                     ParticleSwarm.function_random(min_random, max_random,
+                #                                                   np.random.random())]) * random_length_c1
+                plus_c2 = np.array([ParticleSwarm.function_random(min_random, max_random, np.random.random()),
+                                    ParticleSwarm.function_random(min_random, max_random,
+                                                                  np.random.random())]) * random_length_c2
+                plus_c3 = ParticleSwarm.function_random(min_random, max_random,
+                                                        np.random.random()) * random_length_c3 * v1
+
+                curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0, curves[j].c1,
+                                               curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
+                                               curves[j].p1)
+                new_rate = curves[j].rate_curve(curves[j])
+
+                if best_rate > new_rate:
+                    best_rate = new_rate
+                    best_curve = curves[j]
+
+        return curves
+
+    @staticmethod
+    def last_curves_connect(curve, ang1, p2, ang2, res=15):
+        curves = [ParticleSwarm.start_curves_connect(curve, ang1, p2, ang2)]
+        for i in range(1, res, 1):
+            curves.append(ParticleSwarm.next_curves_connect(curves[i - 1], ang1, ang2))
+
+        best_rate = 9999
+        best_curve = None
+
+        for i in range(0, len(curves[res - 1]), 1):
+            new_rate = curves[res - 1][i].rate_curve(curves[res - 1][i])
+            if 0 < new_rate < best_rate:
+                best_rate = new_rate
+                best_curve = curves[res - 1][i]
+
+        return ParticleSwarm(curve.p1, p2, best_curve, curves[0], curves[res - 1])
+
     def __str__(self):
         return self.curves
