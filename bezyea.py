@@ -13,7 +13,10 @@ from pyparsing import range
 from trajectory import *
 from progress.bar import Bar
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
 class BezierCurve(object):
     def __init__(self, p0, p1):
         self.p0 = p0
@@ -246,6 +249,7 @@ class BezierPath(object):
         # print self.curves
         self.max_v = 2
         self.max_a = 2
+<<<<<<< HEAD
         self.counter = 1
         self.counter1 = 0
         self.list_curves_x = [[]]
@@ -255,6 +259,9 @@ class BezierPath(object):
         # self.points = []
         # self.fig = plt.figure()
         self.plots = []
+=======
+
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
         # for j in range(0, len(self.curves[0]), 1):
         #     self.plots.append([plt.plot([], [])[0] for _ in range(len(self.curves[0]))])
         # self.patches = self.plots[0] + self.plots[1]
@@ -262,7 +269,11 @@ class BezierPath(object):
         #     self.patches += self.plots[j]
 
     # first argument is t, second argument is curve number
+<<<<<<< HEAD
     def __call__(self, *args, **kwaergs):
+=======
+    def __call__(self, *args, **kwargs):
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
         t = args[0]
         s = args[2]
         seg = args[1]
@@ -275,11 +286,17 @@ class BezierPath(object):
     def draw_path(self, res=1000.0):
         x_list = []
         y_list = []
+<<<<<<< HEAD
         # ax = plt.axes(xlim=(0, 2), ylim=(0, 100))
         # for j in xrange(0, len(self.curves)):
         for s in xrange(0, len(self.curves[0])):
             for t in xrange(0, int(res + 1)):
                 # print self.get_angle(t / res, s)
+=======
+
+        for s in xrange(0, len(self.curves[0])):
+            for t in xrange(0, int(res + 1)):
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
                 x_list.append(self(t / res, s, 0)[0])
                 y_list.append(self(t / res, s, 0)[1])
 
@@ -288,9 +305,13 @@ class BezierPath(object):
             y_list = []
 
         plt.axes().set_aspect('equal', 'datalim')
+<<<<<<< HEAD
         # plt.plot(x_list, y_list)
 
         # ani = self.animation_draw()
+=======
+
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
         plt.show()
 
     def get_setpoints(self, arc_length=0.00005):
@@ -301,6 +322,7 @@ class BezierPath(object):
             start_position += l[-1].p
         return l
 
+<<<<<<< HEAD
     def animate_init(self):
         res = 1000.0
         x_list = []
@@ -382,6 +404,8 @@ class BezierPath(object):
 
         return self.patches
 
+=======
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
     def __str__(self):
         return self.curves
 

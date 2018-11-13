@@ -1,6 +1,10 @@
 # import matplotlib.pyplot as plt
 from bezyea import *
 from Optimization import *
+<<<<<<< HEAD
+=======
+from Animation import *
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
 
 p0 = np.array([0, 0])
 ang0 = 90
@@ -8,6 +12,7 @@ p1 = np.array([1, 1])
 ang1 = 90
 p2 = np.array([2, 2])
 ang2 = 0
+<<<<<<< HEAD
 #
 # c2 = []
 # for i in range(5):
@@ -95,3 +100,14 @@ path.draw_path()
 # plt.axes().set_aspect('equal', 'datalim')
 # plt.plot(x_list, y_list)
 # plt.show()
+=======
+
+c1 = ParticleSwarm.start_curves(p0, ang0, p1, ang1)
+anim = Animation(c1)
+anim.display()
+
+
+# path = BezierPath(c1)
+# path.display()
+# path.draw_path()
+>>>>>>> 424ce440dd3d63f007357039a0b375764b7eb799
