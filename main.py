@@ -11,7 +11,7 @@ p2 = np.array([2, 2])
 ang2 = 0
 
 c1 = ParticleSwarm.start_curves(p0, ang0, p1, ang1)
-anim = Animation(c1)
+anim = Animation(ang0, ang1, c1)
 anim.display()
 
 
