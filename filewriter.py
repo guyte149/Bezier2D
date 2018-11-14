@@ -31,3 +31,4 @@ class FileWriter:
                 file.write(str(self.left_trajectory[i].p) + ",")
                 file.write(str(self.left_trajectory[i].v) + ",")
                 file.write(str(self.left_trajectory[i].a) + "\n")
+

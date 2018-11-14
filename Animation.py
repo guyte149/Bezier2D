@@ -6,13 +6,16 @@ from Optimization import *
 
 class Animation(object):
 
-    def __init__(self, *curves):
+    def __init__(self, ang0, ang1, *curves):
+
+        self.ang0 = ang0
+        self.ang1 = ang1
 
         # First set up the figure, the axis, and the plot element we want to animate
         self.curves = curves
         self.first_curves = curves
         self.fig = plt.figure()
-        self.ax = plt.axes(xlim=(-0.5, 2), ylim=(-0.5, 2))
+        self.ax = plt.axes(xlim=(-1.5, 3), ylim=(-1.5, 3))
         self.line, = self.ax.plot([], [], lw=2)
         self.line_list = []
         plotcols = ["black", "red", "blue", "green", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
@@ -24,7 +27,6 @@ class Animation(object):
     # first argument is t, second argument is curve number
     def __call__(self, *args, **kwargs):
         t = args[0]
-        s = args[2]
         seg = args[1]
         # print 'seg={}   cur/ves seg - {}'.format(seg, self.curves[seg])
         return self.curves[0][seg](t)
@@ -38,11 +40,10 @@ class Animation(object):
     # animation function.  This is called sequentially
     def animate(self, i):
 
-        curves = ParticleSwarm.next_curves(self.curves[0], 90, 90)
-        for j in range(0, len(self.curves[0]), 1):
+        curves = ParticleSwarm.next_curves(self.curves[0], self.ang0, self.ang1)
+        for j in xrange(0, len(self.curves[0]), 1):
             self.curves[0][j] = curves[j]
 
-        s = 0
         t_list = np.linspace(0.0, 1.0, 1000.0)
 
         for s in xrange(0, len(self.curves[0])):
@@ -52,8 +53,8 @@ class Animation(object):
 
             for t in t_list:
                 # print self.get_angle(t / res, s)
-                x_list.append(self(t, s, 0)[0])
-                y_list.append(self(t, s, 0)[1])
+                x_list.append(self(t, s)[0])
+                y_list.append(self(t, s)[1])
 
             self.line_list[s].set_data(x_list, y_list)
             # self.line.set_data(x_list, y_list)
