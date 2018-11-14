@@ -16,13 +16,15 @@ class Animation(object):
         self.first_curves = curves
         self.fig = plt.figure()
         self.ax = plt.axes(xlim=(-1.5, 3), ylim=(-1.5, 3))
-        self.line, = self.ax.plot([], [], lw=2)
-        self.line_list = []
+        self.plot_list = []
         plotcols = ["black", "red", "blue", "green", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
                     "magenta", "gold", "silver", "turquoise"]
         for s in xrange(0, len(self.curves[0])):
             lobj = self.ax.plot([], [], lw=2, color=plotcols[s])[0]
-            self.line_list.append(lobj)
+            self.plot_list.append(lobj)
+        for i in xrange(0, 4):
+            plot_point = self.ax.plot([], [], 'ro')[0]
+            self.plot_list.append(plot_point)
 
     # first argument is t, second argument is curve number
     def __call__(self, *args, **kwargs):
@@ -33,14 +35,15 @@ class Animation(object):
 
     # initialization function: plot the background of each frame
     def init(self):
-        for line in self.line_list:
-            line.set_data([], [])
-        return self.line_list
+        for plot in self.plot_list:
+            plot.set_data([], [])
+        return self.plot_list
 
     # animation function.  This is called sequentially
     def animate(self, i):
 
-        curves = ParticleSwarm.next_curves(self.curves[0], self.ang0, self.ang1)
+        curves = ParticleSwarm.next_curves(self.curves[0], self.ang0, self.ang1)[0]
+        best_curve = ParticleSwarm.next_curves(self.curves[0], self.ang0, self.ang1)[1]
         for j in xrange(0, len(self.curves[0]), 1):
             self.curves[0][j] = curves[j]
 
@@ -56,9 +59,15 @@ class Animation(object):
                 x_list.append(self(t, s)[0])
                 y_list.append(self(t, s)[1])
 
-            self.line_list[s].set_data(x_list, y_list)
-            # self.line.set_data(x_list, y_list)
-        return self.line_list
+            self.plot_list[s].set_data(x_list, y_list)
+
+        # setting data for control points
+        self.plot_list[len(self.curves[0])].set_data(best_curve.c0[0], best_curve.c0[1])
+        self.plot_list[len(self.curves[0]) + 1].set_data(best_curve.c1[0], best_curve.c1[1])
+        self.plot_list[len(self.curves[0]) + 2].set_data(best_curve.c2[0], best_curve.c2[1])
+        self.plot_list[len(self.curves[0]) + 3].set_data(best_curve.c3[0], best_curve.c3[1])
+
+        return self.plot_list
 
     def display(self):
         # call the animator.  blit=True means only re-draw the parts that have changed.

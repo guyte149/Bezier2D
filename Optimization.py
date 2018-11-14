@@ -263,13 +263,13 @@ class ParticleSwarm(Optimization):
                     best_rate = new_rate
                     best_curve = curves[j]
 
-        return curves
+        return curves, best_curve
 
     @staticmethod
     def last_curves(p0, ang0, p1, ang1, res=15):
         curves = [ParticleSwarm.start_curves(p0, ang0, p1, ang1)]
         for i in range(1, res, 1):
-            curves.append(ParticleSwarm.next_curves(curves[i - 1], ang0, ang1))
+            curves.append(ParticleSwarm.next_curves(curves[i - 1], ang0, ang1)[0])
 
         best_rate = 9999
         best_curve = None
