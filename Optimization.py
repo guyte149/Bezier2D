@@ -127,19 +127,19 @@ class ParticleSwarm(Optimization):
                 random_length_y.append(p0[1])
                 random_length_y.append(p1[1])
 
-            elif p0[0] > p1[0] and p0[1] < p1[1]:
+            elif p0[0] >= p1[0] and p0[1] < p1[1]:
                 random_length_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
                 random_length_x.append(p0[0])
                 random_length_y.append(p0[1])
                 random_length_y.append(p1[1])
 
-            elif p0[0] < p1[0] and p0[1] > p1[1]:
+            elif p0[0] < p1[0] and p0[1] >= p1[1]:
                 random_length_x.append(p0[0])
                 random_length_x.append(p1[0])
                 random_length_y.append(p1[1])
                 random_length_y.append(p0[1] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
 
-            elif p0[0] > p1[0] and p0[1] > p1[1]:
+            elif p0[0] >= p1[0] and p0[1] >= p1[1]:
                 random_length_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
                 random_length_x.append(p0[0])
                 random_length_y.append(p1[1])
@@ -158,26 +158,26 @@ class ParticleSwarm(Optimization):
                 random_length_y.append(p0[1])
                 random_length_y.append(p1[1])
 
-            elif p0[0] < p1[0] and p0[1] > p1[1]:
+            elif p0[0] <= p1[0] and p0[1] >= p1[1]:
                 random_length_x.append(p0[0])
                 random_length_x.append(p1[0] + abs(p1[0] - p0[0]) + abs(p1[1] - p0[1]))
                 random_length_y.append(p1[1])
                 random_length_y.append(p0[1])
 
-            elif p0[0] > p1[0] and p0[1] > p1[1]:
+            elif p0[0] >= p1[0] and p0[1] >= p1[1]:
                 random_length_x.append(p1[0] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
                 random_length_x.append(p0[0])
                 random_length_y.append(p1[1])
                 random_length_y.append(p0[1])
 
         elif ang0 == ang1:
-            if p0[0] < p1[0] and p0[1] < p1[1]:
+            if p0[0] <= p1[0] and p0[1] < p1[1]:
                 random_length_x.append(p0[0])
                 random_length_x.append(p1[0])
                 random_length_y.append(p0[1])
                 random_length_y.append(p1[1])
 
-            elif p0[0] < p1[0] and p0[1] > p1[1]:
+            elif p0[0] <= p1[0] and p0[1] >= p1[1]:
                 random_length_x.append(p0[0])
                 random_length_x.append(p1[0])
                 random_length_y.append(p1[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
@@ -189,7 +189,7 @@ class ParticleSwarm(Optimization):
                 random_length_y.append(p0[1])
                 random_length_y.append(p1[1])
 
-            elif p0[0] > p1[0] and p0[1] > p1[1]:
+            elif p0[0] > p1[0] and p0[1] >= p1[1]:
                 random_length_x.append(p1[0])
                 random_length_x.append(p0[0])
                 random_length_y.append(p1[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
@@ -204,8 +204,8 @@ class ParticleSwarm(Optimization):
         max_random_y = random_length_y[1]
 
         for i in range(0, res, 1):
-            u0 = ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random())
-            u1 = ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random())
+            u0 = abs(ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random()))
+            u1 = abs(ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random()))
 
             c0 = p0 + u0 * v0
             c1 = np.array([ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random()),
