@@ -11,7 +11,7 @@ from matplotlib.lines import Line2D
 from pyparsing import range
 
 from trajectory import *
-from progress.bar import Bar
+
 
 class BezierCurve(object):
     def __init__(self, p0, p1):
