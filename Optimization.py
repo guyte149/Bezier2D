@@ -227,8 +227,11 @@ class ParticleSwarm(Optimization):
 
         best_curve = None
 
+        list_curve = []
+
         for i in range(len(curves)):
             new_rate = curves[i].rate_curve(curves[i])
+            list_curve.append(new_rate)
             if best_rate > new_rate:
                 best_rate = new_rate
                 best_curve = curves[i]
@@ -254,14 +257,21 @@ class ParticleSwarm(Optimization):
                 plus_c3 = ParticleSwarm.function_random(min_random, max_random,
                                                         np.random.random()) * random_length_c3 * v1
 
-                curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
+                # curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
+                #                                curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
+                #                                curves[j].p1)
+                new_curve = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
                                                curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
                                                curves[j].p1)
-                new_rate = curves[j].rate_curve(curves[j])
 
-                if best_rate > new_rate:
-                    best_rate = new_rate
-                    best_curve = curves[j]
+                new_rate = new_curve.rate_curve(new_curve)
+
+                if list_curve[j] > new_rate:
+                    curves[j] = new_curve
+
+                    if best_rate > new_rate:
+                        best_rate = new_rate
+                        best_curve = curves[j]
 
         return curves, best_curve
 
@@ -297,19 +307,19 @@ class ParticleSwarm(Optimization):
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
-            elif curve.p1[0] > p2[0] and curve.p1[1] < p2[1]:
+            elif curve.p1[0] >= p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
                 random_length_x.append(curve.p1[0])
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
-            elif curve.p1[0] < p2[0] and curve.p1[1] > p2[1]:
+            elif curve.p1[0] < p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(curve.p1[0])
                 random_length_x.append(p2[0])
                 random_length_y.append(p2[1])
                 random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
 
-            elif curve.p1[0] > p2[0] and curve.p1[1] > p2[1]:
+            elif curve.p1[0] >= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
                 random_length_x.append(curve.p1[0])
                 random_length_y.append(p2[1])
@@ -328,26 +338,26 @@ class ParticleSwarm(Optimization):
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
-            elif curve.p1[0] < p2[0] and curve.p1[1] > p2[1]:
+            elif curve.p1[0] <= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(curve.p1[0])
                 random_length_x.append(p2[0] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
                 random_length_y.append(p2[1])
                 random_length_y.append(curve.p1[1])
 
-            elif curve.p1[0] > p2[0] and curve.p1[1] > p2[1]:
+            elif curve.p1[0] >= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
                 random_length_x.append(curve.p1[0])
                 random_length_y.append(p2[1])
                 random_length_y.append(curve.p1[1])
 
         elif ang1 == ang2:
-            if curve.p1[0] < p2[0] and curve.p1[1] < p2[1]:
+            if curve.p1[0] <= p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(curve.p1[0])
                 random_length_x.append(p2[0])
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
-            elif curve.p1[0] < p2[0] and curve.p1[1] > p2[1]:
+            elif curve.p1[0] <= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(curve.p1[0])
                 random_length_x.append(p2[0])
                 random_length_y.append(p2[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
@@ -359,7 +369,7 @@ class ParticleSwarm(Optimization):
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
-            elif curve.p1[0] > p2[0] and curve.p1[1] > p2[1]:
+            elif curve.p1[0] > p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(p2[0])
                 random_length_x.append(curve.p1[0])
                 random_length_y.append(p2[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
@@ -399,8 +409,11 @@ class ParticleSwarm(Optimization):
 
         best_curve = None
 
+        list_rate = []
+
         for i in range(len(curves)):
             new_rate = curves[i].rate_curve(curves[i])
+            list_rate.append(new_rate)
             if best_rate > new_rate:
                 best_rate = new_rate
                 best_curve = curves[i]
@@ -426,14 +439,17 @@ class ParticleSwarm(Optimization):
                 plus_c3 = ParticleSwarm.function_random(min_random, max_random,
                                                         np.random.random()) * random_length_c3 * v1
 
-                curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0, curves[j].c1,
+                new_curve = QuanticBezierCurve(curves[j].p0, curves[j].c0, curves[j].c1,
                                                curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
                                                curves[j].p1)
-                new_rate = curves[j].rate_curve(curves[j])
+                new_rate = new_curve.rate_curve(new_curve)
 
-                if best_rate > new_rate:
-                    best_rate = new_rate
-                    best_curve = curves[j]
+                if list_rate[j] > new_rate:
+                    curves[j] = new_curve
+
+                    if best_rate > new_rate:
+                        best_rate = new_rate
+                        best_curve = curves[j]
 
         return curves
 
