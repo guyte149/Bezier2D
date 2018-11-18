@@ -451,7 +451,7 @@ class ParticleSwarm(Optimization):
                         best_rate = new_rate
                         best_curve = curves[j]
 
-        return curves
+        return curves, best_curve
 
     @staticmethod
     def last_curves_connect(curve, ang1, p2, ang2, res=15):

@@ -42,8 +42,9 @@ class Animation(object):
     # animation function.  This is called sequentially
     def animate(self, i):
 
-        curves = ParticleSwarm.next_curves(self.curves[0], self.ang0, self.ang1)[0]
-        best_curve = ParticleSwarm.next_curves(self.curves[0], self.ang0, self.ang1)[1]
+        nextCycle = ParticleSwarm.next_curves(self.curves[0], self.ang0, self.ang1)
+        curves = nextCycle[0]
+        best_curve = nextCycle[1]
         for j in xrange(0, len(self.curves[0]), 1):
             self.curves[0][j] = curves[j]
 
@@ -118,8 +119,9 @@ class AnimationConnection(object):
     # animation function.  This is called sequentially
     def animate(self, i):
 
-        curves = ParticleSwarm.next_curves(self.curves, self.ang1, self.ang2)[0]
-        best_curve = ParticleSwarm.next_curves(self.curves, self.ang1, self.ang2)[1]
+        nextCycle = ParticleSwarm.next_curves_connect(self.curves, self.ang1, self.ang2)
+        curves = nextCycle[0]
+        best_curve = nextCycle[1]
         for j in xrange(0, len(self.curves), 1):
             self.curves[j] = curves[j]
 
