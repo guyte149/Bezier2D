@@ -15,7 +15,7 @@ ang2 = 0
 # anim.display()
 c3 = ParticleSwarm.last_curves(p0, ang0, p1, ang1)
 c2 = ParticleSwarm.start_curves_connect(c3.best_curve, ang1, p2, ang2)
-anim = AnimationConnection(c3.best_curve, ang1, ang2, c2)
+anim = AnimationConnection(c3.best_curve, ang1, p2, ang2)
 anim.display()
 
 # c1 = QuanticBezierCurve.create_curve(p0, ang0, p1, ang1)
