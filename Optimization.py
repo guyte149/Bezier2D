@@ -241,10 +241,10 @@ class ParticleSwarm(Optimization):
 
         for j in range(0, len(curves), 1):
             if best_curve != curves[j]:
-                random_length_c0 = (best_curve.c0 - best_curve.p0) / v0 - (curves[j].c0 - curves[j].p0) / v0
+                random_length_c0 = (best_curve.c0 - best_curve.p0) - (curves[j].c0 - curves[j].p0)
                 random_length_c1 = best_curve.c1 - curves[j].c1
                 random_length_c2 = best_curve.c2 - curves[j].c2
-                random_length_c3 = (best_curve.c3 - best_curve.p1) / v1 - (curves[j].c3 - curves[j].p1) / v1
+                random_length_c3 = (best_curve.c3 - best_curve.p1) - (curves[j].c3 - curves[j].p1)
 
                 plus_c0 = ParticleSwarm.function_random(min_random, max_random,
                                                         np.random.random()) * random_length_c0 * v0
@@ -276,7 +276,7 @@ class ParticleSwarm(Optimization):
         return curves, best_curve
 
     @staticmethod
-    def last_curves(p0, ang0, p1, ang1, res=15):
+    def last_curves(p0, ang0, p1, ang1, res=20):
         curves = [ParticleSwarm.start_curves(p0, ang0, p1, ang1)]
         for i in range(1, res, 1):
             curves.append(ParticleSwarm.next_curves(curves[i - 1], ang0, ang1)[0])
@@ -426,7 +426,7 @@ class ParticleSwarm(Optimization):
                 # random_length_c0 = (best_curve.c0 - best_curve.p0) / v0 - (curves[j].c0 - curves[j].p0) / v0
                 # random_length_c1 = best_curve.c1 - curves[j].c1
                 random_length_c2 = best_curve.c2 - curves[j].c2
-                random_length_c3 = (best_curve.c3 - best_curve.p1) / v1 - (curves[j].c3 - curves[j].p1) / v1
+                random_length_c3 = (best_curve.c3 - best_curve.p1) - (curves[j].c3 - curves[j].p1)
 
                 # plus_c0 = ParticleSwarm.function_random(min_random, max_random,
                 #                                         np.random.random()) * random_length_c0 * v0
@@ -451,7 +451,7 @@ class ParticleSwarm(Optimization):
                         best_rate = new_rate
                         best_curve = curves[j]
 
-        return curves
+        return curves, best_curve
 
     @staticmethod
     def last_curves_connect(curve, ang1, p2, ang2, res=15):
