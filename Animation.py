@@ -15,7 +15,7 @@ class Animation(object):
         self.curves = curves
         self.first_curves = curves
         self.fig = plt.figure()
-        self.ax = plt.axes(xlim=(-1.5, 3), ylim=(-1.5, 3))
+        self.ax = plt.axes(xlim=(0, 2), ylim=(0, 2))
         self.plot_list = []
         plotcols = ["black", "red", "blue", "green", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
                     "magenta", "gold", "silver", "turquoise"]
