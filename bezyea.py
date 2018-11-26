@@ -276,8 +276,8 @@ class BezierPath(object):
             x_list = []
             y_list = []
 
-        cp_x_list = [self.curves[0][1].c0[0], self.curves[0][1].c1[0], self.curves[0][1].c2[0], self.curves[0][1].c3[0]]
-        cp_y_list = [self.curves[0][1].c0[1], self.curves[0][1].c1[1], self.curves[0][1].c2[1], self.curves[0][1].c3[1]]
+        cp_x_list = [self.curves[0][0].c0[0], self.curves[0][0].c1[0], self.curves[0][0].c2[0], self.curves[0][0].c3[0]]
+        cp_y_list = [self.curves[0][0].c0[1], self.curves[0][0].c1[1], self.curves[0][0].c2[1], self.curves[0][0].c3[1]]
 
         plt.plot(cp_x_list, cp_y_list, 'ro')
         plt.axes().set_aspect('equal', 'datalim')

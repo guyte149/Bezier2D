@@ -15,10 +15,10 @@ class Animation(object):
         self.curves = curves
         self.first_curves = curves
         self.fig = plt.figure()
-        self.ax = plt.axes(xlim=(0, 2), ylim=(0, 2))
+        self.ax = plt.axes(xlim=(-0.5, 2), ylim=(-1, 1))
         self.plot_list = []
         plotcols = ["black", "red", "blue", "green", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
-                    "magenta", "gold", "silver", "turquoise"]
+                    "magenta", "gold", "silver", "turquoise", "salmon"]
         for s in xrange(0, len(self.curves[0])):
             lobj = self.ax.plot([], [], lw=2, color=plotcols[s])[0]
             self.plot_list.append(lobj)
@@ -91,10 +91,10 @@ class AnimationConnection(object):
         self.curves = curves
         self.first_curves = curves
         self.fig = plt.figure()
-        self.ax = plt.axes(xlim=(-0.5, 5), ylim=(-0.5, 5))
+        self.ax = plt.axes(xlim=(-0.5, 3), ylim=(-1, 3))
         self.plot_list = []
         plotcols = ["black", "red", "blue", "green", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
-                    "magenta", "gold", "silver", "turquoise"]
+                    "magenta", "gold", "silver", "turquoise", "salmon"]
         for s in xrange(0, len(self.curves)):
             lobj = self.ax.plot([], [], lw=2, color=plotcols[s])[0]
             self.plot_list.append(lobj)
