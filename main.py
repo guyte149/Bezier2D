@@ -6,18 +6,18 @@ from Animation import *
 p0 = np.array([0, 0])
 ang0 = 90
 p1 = np.array([1, 1])
-ang1 = 270
-p2 = np.array([0, 1])
-ang2 = 180
+ang1 = 0
+p2 = np.array([2, 0])
+ang2 = 270
 
-# c1 = ParticleSwarm.start_curves(p0, ang0, p1, ang1)
-# anim = Animation(ang0, ang1, c1)
-# anim.display()
+c1 = ParticleSwarm.start_curves(p0, ang0, p1, ang1)
+anim = Animation(ang0, ang1, c1)
+anim.display()
 c3 = ParticleSwarm.last_curves(p0, ang0, p1, ang1)
 c2 = ParticleSwarm.last_curves_connect(c3.best_curve, ang1, p2, ang2).best_curve
 # c1 = ParticleSwarm.start_curves_connect(c3.best_curve, ang1, p2, ang2)
-# anim = AnimationConnection(c3.best_curve, ang1, p2, ang2)
-# anim.display()
+anim = AnimationConnection(c3.best_curve, ang1, p2, ang2)
+anim.display()
 
 path = BezierPath([c2, c3.best_curve])
 path.draw_path()

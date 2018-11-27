@@ -113,7 +113,7 @@ class ParticleSwarm(Optimization):
         return self.curves
 
     @staticmethod
-    def start_curves(p0, ang0, p1, ang1, res=16):
+    def start_curves(p0, ang0, p1, ang1, res=25):
         curves = []
         l = np.linalg.norm(p1 - p0)
 
@@ -154,9 +154,9 @@ class ParticleSwarm(Optimization):
                 # random_length_y.append(p0[1] - abs(p1[0] - p0[0]) - abs(p1[1] - p0[1]))
                 random_length_y.append(p1[1])
 
-            elif p0[0] > p1[0] and p0[1] < p1[1]:
+            elif p0[0] >= p1[0] and p0[1] < p1[1]:
                 random_length_x.append(p1[0])
-                random_length_x.append(p0[0])
+                random_length_x.append(p0[0] + abs(p1[1] - p0[1]))
                 random_length_y.append(p0[1])
                 random_length_y.append(p1[1])
 
@@ -263,7 +263,7 @@ class ParticleSwarm(Optimization):
                 # curves[j] = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
                 #                                curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
                 #                                curves[j].p1)
-                if v1[0] < 0 or v1[1] < 0:
+                if v1[0] < 0:
                     plus_c3 = -plus_c3
                 new_curve = QuanticBezierCurve(curves[j].p0, curves[j].c0 + plus_c0, curves[j].c1 + plus_c1,
                                                curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
@@ -299,7 +299,7 @@ class ParticleSwarm(Optimization):
         return ParticleSwarm(p0, p1, best_curve, curves[0], curves[res - 1])
 
     @staticmethod
-    def start_curves_connect(curve, ang1, p2, ang2, res=16):
+    def start_curves_connect(curve, ang1, p2, ang2, res=25):
         curves = []
         l = np.linalg.norm(p2 - curve.p1)
 
@@ -340,9 +340,10 @@ class ParticleSwarm(Optimization):
                 # random_length_y.append(curve.p1[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
                 random_length_y.append(p2[1])
 
-            elif curve.p1[0] > p2[0] and curve.p1[1] < p2[1]:
+            elif curve.p1[0] >= p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(p2[0])
-                random_length_x.append(curve.p1[0])
+                random_length_x.append(curve.p1[0] + abs(p2[1] - curve.p1[1]))
+                # random_length_x.append(curve.p1[0])
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
@@ -447,11 +448,12 @@ class ParticleSwarm(Optimization):
                 plus_c3 = ParticleSwarm.function_random(min_random, max_random,
                                                         np.random.random()) * random_length_c3 * v1
 
-                if v1[0] < 0 or v1[1] < 0:
+                if v1[0] < 0:
                     plus_c3 = -plus_c3
                 new_curve = QuanticBezierCurve(curves[j].p0, curves[j].c0, curves[j].c1,
                                                curves[j].c2 + plus_c2, curves[j].c3 + plus_c3,
                                                curves[j].p1)
+                print "control point c3 {} of curve {}".format(new_curve.c3, j)
                 new_rate = new_curve.rate_curve(new_curve)
 
                 if list_rate[j] > new_rate:
