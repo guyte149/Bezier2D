@@ -11,6 +11,7 @@ from matplotlib.lines import Line2D
 from pyparsing import range
 
 from trajectory import *
+import bezier
 
 
 class BezierCurve(object):
@@ -306,12 +307,19 @@ class QuanticBezierCurve(BezierCurve):
         self.c3 = c3
         self.p1 = p1
 
+        # branch changes
+        nodes = np.array([p0, c0, c1, c2, c3, p1]).T
+        self.bezier_lib = bezier.Curve(nodes, degree=5)
+
     def __call__(self, *args, **kwargs):
         t = args[0]
-        omt = 1 - t
-        return (self.p0 * omt * omt * omt * omt * omt) + (self.c0 * 5 * t * omt * omt * omt * omt) + (
-                self.c1 * 10 * t * t * omt * omt * omt) + (self.c2 * 10 * t * t * t * omt * omt) + (
-                       self.c3 * 5 * t * t * t * t * omt) + (self.p1 * t * t * t * t * t)
+        # omt = 1 - t
+        # return (self.p0 * omt * omt * omt * omt * omt) + (self.c0 * 5 * t * omt * omt * omt * omt) + (
+        #         self.c1 * 10 * t * t * omt * omt * omt) + (self.c2 * 10 * t * t * t * omt * omt) + (
+        #                self.c3 * 5 * t * t * t * t * omt) + (self.p1 * t * t * t * t * t)
+
+        # branch changes
+        return self.bezier_lib.evaluate(t)
 
     def bezier_derivative(self, t):
         omt = 1 - t
