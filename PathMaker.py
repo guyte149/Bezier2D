@@ -132,7 +132,6 @@ points_text_list.append("total_time = {}".format(right_trajectory_sliced[-1].tim
 # draw.text((x, y),"Sample Text",(r,g,b))
 
 
-
-    # > 0,0,90
-    # > -0.65,4.3,90
-    # > 0,6.95,105
+# > 0,0,90
+# > -0.65,4.3,90
+# > 0,6.95,105
