@@ -303,38 +303,50 @@ class ParticleSwarm(Optimization):
         curves = []
         l = np.linalg.norm(p2 - curve.p1)
 
+        random_length_u = []
+
         random_length_x = []
         random_length_y = []
 
         if ang1 - ang2 > 0:
             if curve.p1[0] < p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
             elif curve.p1[0] >= p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_u.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
             elif curve.p1[0] < p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 random_length_y.append(p2[1])
                 random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
 
             elif curve.p1[0] >= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_u.append(p2[0])
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_y.append(p2[1])
                 random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
 
         elif ang1 - ang2 < 0:
             if curve.p1[0] < p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 # random_length_x.append(p2[0] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
                 random_length_y.append(curve.p1[1])
                 # random_length_y.append(curve.p1[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
@@ -342,6 +354,8 @@ class ParticleSwarm(Optimization):
 
             elif curve.p1[0] >= p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
+                random_length_u.append(curve.p1[0] + abs(p2[1] - curve.p1[1]))
                 random_length_x.append(curve.p1[0] + abs(p2[1] - curve.p1[1]))
                 # random_length_x.append(curve.p1[0])
                 random_length_y.append(curve.p1[1])
@@ -349,12 +363,16 @@ class ParticleSwarm(Optimization):
 
             elif curve.p1[0] <= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 random_length_y.append(p2[1])
                 random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]))
 
             elif curve.p1[0] >= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(p2[0] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
+                random_length_u.append(p2[0])
+                random_length_u.append(curve.p1[0])
                 random_length_x.append(curve.p1[0])
                 random_length_y.append(p2[1])
                 random_length_y.append(curve.p1[1])
@@ -362,25 +380,33 @@ class ParticleSwarm(Optimization):
         elif ang1 == ang2:
             if curve.p1[0] <= p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
             elif curve.p1[0] <= p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 random_length_y.append(p2[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
                 random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
 
             elif curve.p1[0] > p2[0] and curve.p1[1] < p2[1]:
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_y.append(curve.p1[1])
                 random_length_y.append(p2[1])
 
             elif curve.p1[0] > p2[0] and curve.p1[1] >= p2[1]:
                 random_length_x.append(p2[0])
+                random_length_u.append(p2[0])
                 random_length_x.append(curve.p1[0])
+                random_length_u.append(curve.p1[0])
                 random_length_y.append(p2[1] - abs(p2[0] - curve.p1[0]) - abs(p2[1] - curve.p1[1]))
                 random_length_y.append(curve.p1[1] + abs(p2[0] - curve.p1[0]) + abs(p2[1] - curve.p1[1]))
 
@@ -394,7 +420,8 @@ class ParticleSwarm(Optimization):
 
         for i in range(0, res, 1):
             # u0 = ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random())
-            u1 = ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random())
+            u1 = ParticleSwarm.function_random(random_length_u[0], random_length_u[1], np.random.random())
+            # u1 = ParticleSwarm.function_random(min_random_x, max_random_x, np.random.random())
 
             # c0 = curve.p1 + u0 * v0
             c0 = 2 * curve.p1 - curve.c3
