@@ -307,6 +307,13 @@ class QuanticBezierCurve(BezierCurve):
         nodes = np.array([p0, c0, c1, c2, c3, p1]).T
         self.bezier_lib = bezier.Curve(nodes, degree=5)
 
+    def call_multi(self, ts):
+        """
+        :param ts: a vector of us (the path parameter)
+        :return: a vector of points that correspond to the u vector
+        """
+        return self.bezier_lib.evaluate_multi(ts).T
+
     def __call__(self, *args, **kwargs):
         t = args[0]
         # omt = 1 - t
