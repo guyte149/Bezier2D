@@ -86,13 +86,13 @@ class AnimationConnection(object):
         self.ang1 = ang1
         self.ang2 = ang2
 
-        curves = ParticleSwarm.start_curves_connect(self.best_curve, ang1, p2, ang2)
+        curves = ParticleSwarm.start_curves_connect_first_derivative(self.best_curve, ang1, p2, ang2)
 
         # First set up the figure, the axis, and the plot element we want to animate
         self.curves = curves
         self.first_curves = curves
         self.fig = plt.figure()
-        self.ax = plt.axes(xlim=(-1.5, 2.5), ylim=(-1.5, 2.5))
+        self.ax = plt.axes(xlim=(1, 5), ylim=(4, 5.5))
         self.plot_list = []
         plotcols = ["black", "red", "blue", "green", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
                     "magenta", "gold", "silver", "turquoise", "salmon", "black", "red", "green", "yellow", "pink",
@@ -120,8 +120,7 @@ class AnimationConnection(object):
 
     # animation function.  This is called sequentially
     def animate(self, i):
-
-        nextCycle = ParticleSwarm.next_curves_connect(self.curves, self.ang1, self.ang2)
+        nextCycle = ParticleSwarm.next_curves_connect_first_derivative(self.curves, self.ang1, self.ang2)
         curves = nextCycle[0]
         best_curve = nextCycle[1]
         for j in xrange(0, len(self.curves), 1):

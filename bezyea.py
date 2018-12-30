@@ -354,7 +354,7 @@ class QuanticBezierCurve(BezierCurve):
 
     @staticmethod
     def rate_curve(curve):
-        return curve.get_max_curvature_change() + abs(curve.get_max_curvature())
+        return abs(curve.get_max_curvature_change()) + abs(curve.get_max_curvature())
         # return curve.get_max_curvature_change() + abs(curve.get_max_curvature()) + curve.get_curve_length()
         # return curve.get_max_curvature_change() + abs(curve.get_average_curvature_change())
         # return abs(curve.get_average_curvature_change())
