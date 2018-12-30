@@ -96,6 +96,12 @@ class Point(object):
         self.to_stop = True
         board_curve.create_canvas()
 
+    def change_place_for_input(self, x, y):
+        self.canvas.delete(self.oval)
+        self.x = x
+        self.y = y
+        self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
+
 
 class Curves(object):
     def __init__(self, master, canvas, first, place):
@@ -147,7 +153,7 @@ class Curves(object):
             c1 = curve0.curve.c2 + 2 * c0 - 2 * curve0.curve.c3
         self.curve = QuanticBezierCurve(curve0.curve.p1, c0, c1, self.points[2](), self.points[3](),
                                         self.start_points[0]())
-        return self.curve
+        return curve0
 
 
 class Boards(object):
@@ -175,6 +181,8 @@ class Boards(object):
         self.connect_curves = []
         self.connect_curves.append(False)
 
+        self.draw_scales()
+
         self.master.bind("<Button-3>", self.change_point)
         self.create_buttons()
 
@@ -190,13 +198,33 @@ class Boards(object):
         seg = args[1]
         return self.curves[seg](t)
 
+    def draw_scales(self):
+        messeges_x = []
+        messeges_y = []
+        for i in range(1, 11, 1):
+            messeges_x.append(Message(self.master, text=i * 100))
+            messeges_x[i - 1].place(x=i * 100, y=380)
+        for i in range(1, 5, 1):
+            messeges_y.append(Message(self.master, text=i * 100))
+            messeges_y[i - 1].place(x=0, y=i * 100)
+
+
     def create_canvas(self, res=1000.0):
 
         for seg in xrange(0, len(self.curves), 1):
             if seg == 0:
                 self.curves[seg].create_curve()
             else:
-                self.curves[seg].connect_curve(self.curves[seg - 1])
+                self.curves[seg - 1] = self.curves[seg].connect_curve(self.curves[seg - 1])
+            # for i in range(0, 4, 1):
+            self.curves[seg].points[0].change_place_for_input(self.curves[seg].curve.c0[0],
+                                                              self.curves[seg].curve.c0[1])
+            self.curves[seg].points[1].change_place_for_input(self.curves[seg].curve.c1[0],
+                                                              self.curves[seg].curve.c1[1])
+            self.curves[seg].points[2].change_place_for_input(self.curves[seg].curve.c2[0],
+                                                              self.curves[seg].curve.c2[1])
+            self.curves[seg].points[3].change_place_for_input(self.curves[seg].curve.c3[0],
+                                                              self.curves[seg].curve.c3[1])
 
         for seg in xrange(0, len(self.curves), 1):
             for t in xrange(0, int(res), 1):
