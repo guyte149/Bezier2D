@@ -216,14 +216,14 @@ class Boards(object):
             else:
                 self.curves[seg - 1] = self.curves[seg].connect_curve(self.curves[seg - 1])
             # for i in range(0, 4, 1):
-            self.curves[seg].points[0].change_place_for_input(self.curves[seg].curve.c0[0],
-                                                              self.curves[seg].curve.c0[1])
-            self.curves[seg].points[1].change_place_for_input(self.curves[seg].curve.c1[0],
-                                                              self.curves[seg].curve.c1[1])
-            self.curves[seg].points[2].change_place_for_input(self.curves[seg].curve.c2[0],
-                                                              self.curves[seg].curve.c2[1])
-            self.curves[seg].points[3].change_place_for_input(self.curves[seg].curve.c3[0],
-                                                              self.curves[seg].curve.c3[1])
+            # self.curves[seg].points[0].change_place_for_input(self.curves[seg].curve.c0[0],
+            #                                                   self.curves[seg].curve.c0[1])
+            # self.curves[seg].points[1].change_place_for_input(self.curves[seg].curve.c1[0],
+            #                                                   self.curves[seg].curve.c1[1])
+            # self.curves[seg].points[2].change_place_for_input(self.curves[seg].curve.c2[0],
+            #                                                   self.curves[seg].curve.c2[1])
+            # self.curves[seg].points[3].change_place_for_input(self.curves[seg].curve.c3[0],
+            #                                                   self.curves[seg].curve.c3[1])
 
         for seg in xrange(0, len(self.curves), 1):
             for t in xrange(0, int(res), 1):
