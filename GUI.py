@@ -208,7 +208,6 @@ class Boards(object):
             messeges_y.append(Message(self.master, text=i * 100))
             messeges_y[i - 1].place(x=0, y=i * 100)
 
-
     def create_canvas(self, res=1000.0):
 
         for seg in xrange(0, len(self.curves), 1):
@@ -284,7 +283,7 @@ class Boards(object):
 master = Tk()
 master.attributes('-fullscreen', True)
 
-path = "C:\Cheesy_path\FRC-2018-Public-master\cheesy-path\src\main\webapp\\resources\img\\field.png"
+path = "field.png"
 image = Image.open(path)
 image = image.resize((1000, 406), Image.ANTIALIAS)
 img = ImageTk.PhotoImage(image)
