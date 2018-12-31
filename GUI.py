@@ -75,10 +75,11 @@ class Point(object):
         self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
 
     def __call__(self, *args, **kwargs):
-        if self.x == self.last_x and self.y == self.last_y:
-            self.after = False
-        else:
-            self.after = True
+        # if self.x == self.last_x and self.y == self.last_y:
+        #     self.after = False
+        #     # self.after = True
+        # else:
+        #     self.after = True
         return np.array([float(self.x), float(self.y)])
 
     # def stop(self, event):
@@ -103,6 +104,7 @@ class Point(object):
         self.x = x
         self.y = y
         self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
+        self.after = False
 
 
 class Curves(object):
@@ -116,7 +118,8 @@ class Curves(object):
 
         self.curve = None
         self.start_points = []
-        if first:
+        self.first = first
+        if self.first:
             self.start_points.append(PointStart(self.master, self.canvas, 0, place - 25, 0))
         self.start_points.append(PointStart(self.master, self.canvas, 0, place, 0))
         self.points = [Point(self.master, self.canvas, "red", True, 1, 10 + 1 * 100, 10)]
@@ -161,26 +164,72 @@ class Curves(object):
                                         self.start_points[0]())
         return curve0
 
-    def correct_angle(self):
-        # find first start point linear equation
-        x0 = self.start_points[0].x
-        y0 = self.start_points[0].y
-        self.m0 = tan(np.deg2rad(self.start_points[0].angle))
-        self.b0 = y0 - self.m0 * x0
-        # find first control point y parameter
-        x = self.points[0].x
-        y = self.m0 * x + self.b1
-        self.points[0].change_place_for_input(x, y)
+    def correct_angle(self, curve_before):
+        if self.first:
+            # find first start point linear equation
+            x0 = self.start_points[0].x_point
+            y0 = self.start_points[0].y_point
+            self.m0 = tan(np.deg2rad(self.start_points[0].angle))
+            self.b0 = y0 - self.m0 * x0
+            # find first control point y parameter
+            x = self.points[0].x
+            y = self.m0 * x + self.b0
+            y = int(y)
+            self.points[0].change_place_for_input(x, y)
 
-        # find second start point linear equation
-        x0 = self.start_points[1].x
-        y0 = self.start_points[1].y
-        self.m1 = tan(np.deg2rad(self.start_points[1].angle))
-        self.b1 = y0 - self.m1 * x0
-        # find second control point y parameter
-        x = self.points[3].x
-        y = self.m1 * x + self.b1
-        self.points[3].change_place_for_input(x, y)
+            for i in range(int(x0), int(x0) + 100, 1):
+                y = self.m0 * i + self.b0
+                y = int(y)
+                self.canvas.create_oval(i, y, i, y, fill="salmon")
+
+            # find second start point linear equation
+            x0 = self.start_points[1].x_point
+            y0 = self.start_points[1].y_point
+            self.m1 = tan(np.deg2rad(self.start_points[1].angle))
+            self.b1 = y0 - self.m1 * x0
+            # find second control point y parameter
+            x = self.points[3].x
+            y = self.m1 * x + self.b1
+            y = int(y)
+            self.points[3].change_place_for_input(x, y)
+
+            for i in range(int(x0) - 100, int(x0), 1):
+                y = self.m1 * i + self.b1
+                y = int(y)
+                self.canvas.create_oval(i, y, i, y, fill="salmon")
+
+        else:
+            # # find first start point linear equation
+            # x0 = curve_before.start_points[1].x_point
+            # y0 = curve_before.start_points[1].y_point
+            # self.m0 = tan(np.deg2rad(curve_before.start_points[1].angle))
+            # self.b0 = y0 - self.m0 * x0
+            # # find first control point y parameter
+            # x = self.points[0].x
+            # y = self.m0 * x + self.b0
+            # y = int(y)
+            # # self.points[0].change_place_for_input(x, y)
+            #
+            # for i in range(int(x0), int(x0) + 100, 1):
+            #     y = self.m0 * i + self.b0
+            #     y = int(y)
+            #     self.canvas.create_oval(i, y, i, y, fill="salmon")
+
+            # find second start point linear equation
+            x0 = self.start_points[0].x_point
+            y0 = self.start_points[0].y_point
+            self.m1 = tan(np.deg2rad(self.start_points[0].angle))
+            self.b1 = y0 - self.m1 * x0
+            # find second control point y parameter
+            x = self.points[3].x
+            y = self.m1 * x + self.b1
+            y = int(y)
+            self.points[3].change_place_for_input(x, y)
+
+            for i in range(int(x0) - 100, int(x0), 1):
+                y = self.m1 * i + self.b1
+                y = int(y)
+                self.canvas.create_oval(i, y, i, y, fill="salmon")
 
 
 class Boards(object):
@@ -238,21 +287,22 @@ class Boards(object):
     def create_canvas(self, res=1000.0):
 
         for seg in xrange(0, len(self.curves), 1):
-            # self.curves[seg].correct_angle()
             if seg == 0:
+                self.curves[seg].correct_angle(None)
                 self.curves[seg].create_curve()
             else:
+                self.curves[seg].correct_angle(self.curves[seg - 1])
+                # self.curves[seg].points[0].after = False
                 self.curves[seg - 1] = self.curves[seg].connect_curve(self.curves[seg - 1])
             # for i in range(0, 4, 1):
-            # self.curves[seg].points[0].change_place_for_input(self.curves[seg].curve.c0[0],
-            #                                                   self.curves[seg].curve.c0[1])
-            # self.curves[seg].points[1].change_place_for_input(self.curves[seg].curve.c1[0],
-            #                                                   self.curves[seg].curve.c1[1])
+            self.curves[seg].points[0].change_place_for_input(self.curves[seg].curve.c0[0],
+                                                              self.curves[seg].curve.c0[1])
+            self.curves[seg].points[1].change_place_for_input(self.curves[seg].curve.c1[0],
+                                                              self.curves[seg].curve.c1[1])
             # self.curves[seg].points[2].change_place_for_input(self.curves[seg].curve.c2[0],
             #                                                   self.curves[seg].curve.c2[1])
             # self.curves[seg].points[3].change_place_for_input(self.curves[seg].curve.c3[0],
             #                                                   self.curves[seg].curve.c3[1])
-
 
         for seg in xrange(0, len(self.curves), 1):
             for t in xrange(0, int(res), 1):
