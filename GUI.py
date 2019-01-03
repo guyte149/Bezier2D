@@ -1,6 +1,8 @@
 import pickle
 import time
 from Tkinter import *
+
+import pyautogui as pyautogui
 from PIL import ImageTk, Image
 import numpy as np
 from bezyea import *
@@ -44,34 +46,41 @@ class PointStart(object):
         self.text2 = Text(self.master, width=5, height=1)
         self.text2.place(x=self.x + 350, y=self.y)
 
-        for text in (self.text0, self.text1, self.text2):
-            text.bind('<Tab>', lambda e, text=text: self.focus_next(text))
-            text.bind('<Shift-Tab>', lambda e, text=text: self.focus_prev(text))
+        text_list = self.text0, self.text1, self.text2
+        for i, text in enumerate(text_list):
+            text.bind('<Tab>', lambda e, text=text, num=i + 1: self.focus_next(text, num))
+            text.bind('<Shift-Tab>', lambda e, text=text, num=i + 1: self.focus_prev(text, num))
+            text.bind('<Return>', lambda e: self.inputs(True))
 
         self.button = Button(self.master, text="submit", command=self.inputs)
-        self.button.bind('<Return>', lambda e, : self.inputs())
         self.button.place(x=self.x + 425, y=self.y)
 
     @staticmethod
-    def focus_next(text):
-        text.tk_focusNext().focus_set()
+    def focus_next(text, num):
+        if num % 3 == 0:
+            text.tk_focusNext().tk_focusNext().focus_set()
+        else:
+            text.tk_focusNext().focus_set()
         return 'break'
 
     @staticmethod
-    def focus_prev(text):
+    def focus_prev(text, num):
         text.tk_focusPrev().focus_set()
         return 'break'
 
-    def inputs(self):
+    def inputs(self, is_backspace=False):
+        if is_backspace:
+            pyautogui.press('backspace')
         input = []
-        input.append(self.text0.get("1.0", 'end-1c'))
-        input.append(self.text1.get("1.0", 'end-1c'))
-        input.append(self.text2.get("1.0", 'end-1c'))
-        # self.x_point = float(input[0])
-        self.x_point = float(input[0]) * 55.528
-        self.y_point = float(input[1]) * 55.528
-        # self.y_point = float(input[1])
-        self.angle = float(input[2])
+        if self.x_point == 0 and self.y_point == 0:
+            input.append(self.text0.get("1.0", 'end-1c'))
+            input.append(self.text1.get("1.0", 'end-1c'))
+            input.append(self.text2.get("1.0", 'end-1c'))
+            # self.x_point = float(input[0])
+            self.x_point = float(input[0]) * 55.528
+            self.y_point = float(input[1]) * 55.528
+            # self.y_point = float(input[1])
+            self.angle = float(input[2])
         self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
                                             fill="blue")
 
@@ -404,11 +413,61 @@ class Boards(object):
     def save(self):
         s = 'new curve.pkl'
         with open(r'curves\{}'.format(s), 'wb') as f:
-            pickle.dump(self.curves, f)
+            list_curves = []
+            for seg in range(len(self.curves)):
+                list_points = []
+                if seg == 0:
+                    list_points.append(self.curves[seg].start_points[0]())
+                    for point in range(len(self.curves[seg].points)):
+                        list_points.append(self.curves[seg].points[point]())
+                    list_points.append(self.curves[seg].start_points[1]())
+                else:
+                    for point in range(len(self.curves[seg].points)):
+                        list_points.append(self.curves[seg].points[point]())
+                    list_points.append(self.curves[seg].start_points[0]())
+                list_curves.append(list_points)
+            pickle.dump(list_curves, f)
             f.close()
 
     def load(self):
-        pass
+        f = 'new curve.pkl'
+        with open(r'curves\{}'.format(f), "rb") as input_file:
+            list_curves = pickle.load(input_file)
+            for seg in range(len(list_curves)):
+                if seg == 0:
+                    self.curves[seg].start_points[0].x_point = list_curves[seg][0][0]
+                    self.curves[seg].start_points[0].y_point = list_curves[seg][0][1]
+                    for i in range(1, 5, 1):
+                        self.curves[seg].points[i - 1].change_place_for_input(list_curves[seg][i][0],
+                                                                              list_curves[seg][i][1])
+                    self.curves[seg].start_points[1].x_point = list_curves[seg][5][0]
+                    self.curves[seg].start_points[1].y_point = list_curves[seg][5][1]
+                else:
+                    self.curves.append(Curves(self.master, self.canvas, False, self.place, self.num_curve))
+                    # self.curves[seg].start_points[0].x_point = list_curves[seg - 1][5][0]
+                    # self.curves[seg].start_points[0].y_point = list_curves[seg - 1][5][1]
+                    for i in range(1, 5, 1):
+                        self.curves[seg].points[i - 1].change_place_for_input(list_curves[seg][i][0],
+                                                                              list_curves[seg][i][1])
+                    self.curves[seg].start_points[0].x_point = list_curves[seg][5][0]
+                    self.curves[seg].start_points[0].y_point = list_curves[seg][5][1]
+                self.counters.append(0)
+                print self.curves[seg].start_points[0]()
+                print list_curves[seg][0]
+                # print self.curves[seg].start_points[0].y_point
+                self.place += 25
+
+    # def save(self):
+    #     s = 'new curve.pkl'
+    #     data = self.curves
+    #     with open(r'curves\{}'.format(s), "wb") as output_file:
+    #         pickle.dump(data, output_file)
+    #
+    # def load(self):
+    #     s = 'new curve.pkl'
+    #     with open(r'curves\{}'.format(s), "rb") as input_file:
+    #         e = pickle.load(input_file)
+    #         print e
 
 
 # def c(event):
