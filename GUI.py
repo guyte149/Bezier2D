@@ -1,3 +1,4 @@
+import pickle
 import time
 from Tkinter import *
 from PIL import ImageTk, Image
@@ -379,19 +380,14 @@ class Boards(object):
 
     def create_buttons(self):
 
-        self.button = Button(self.master, text="create", command=self.action_button)
-        self.button.place(x=1164, y=100)
+        self.save_button = Button(self.master, text="save", command=self.save)
+        self.save_button.place(x=1164, y=100)
+
+        self.load_button = Button(self.master, text="load", command=self.load)
+        self.load_button.place(x=1164, y=200)
 
         self.button_add_curve = Button(self.master, text="connect curve", command=self.button_connect_curve)
         self.button_add_curve.place(x=1164, y=300)
-
-        # curve = self.curves[0]
-        # self.curves.append(curve)
-
-        # self.curve = QuanticBezierCurve(np.array([0.0, 0.0]), np.array([0.0, 25.0]), np.array([25.0, 50.0]),
-        # np.array([75.0, 50.0]), np.array([100.0, 75.0]), np.array([100.0, 100.0]))
-
-        # return curve
 
     def button_connect_curve(self):
         self.num_curve += 1
@@ -405,13 +401,14 @@ class Boards(object):
         self.list_ovals_curves.append(self.ovals_curves)
         self.counters.append(0)
 
-    def action_button(self):
-        if not self.canvas_on:
-            self.create_canvas()
-            # self.canvas_on = True
-        elif self.canvas_on:
-            self.canvas.destroy()
-            self.canvas_on = False
+    def save(self):
+        s = 'new curve.pkl'
+        with open(r'curves\{}'.format(s), 'wb') as f:
+            pickle.dump(self.curves, f)
+            f.close()
+
+    def load(self):
+        pass
 
 
 # def c(event):
