@@ -48,6 +48,7 @@ class PointStart(object):
             text.bind('<Shift-Tab>', lambda e, text=text: self.focus_prev(text))
 
         self.button = Button(self.master, text="submit", command=self.inputs)
+        self.button.bind('<Return>', lambda e, : self.inputs())
         self.button.place(x=self.x + 425, y=self.y)
 
     @staticmethod
