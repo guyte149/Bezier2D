@@ -394,8 +394,14 @@ class Boards(object):
         self.save_button = Button(self.master, text="save", command=self.save)
         self.save_button.place(x=1164, y=100)
 
+        self.name_file_text_save = Text(self.master, width=10, height=1)
+        self.name_file_text_save.place(x=1120, y=150)
+
         self.load_button = Button(self.master, text="load", command=self.load)
         self.load_button.place(x=1164, y=200)
+
+        self.name_file_text_load = Text(self.master, width=10, height=1)
+        self.name_file_text_load.place(x=1120, y=250)
 
         self.button_add_curve = Button(self.master, text="connect curve", command=self.button_connect_curve)
         self.button_add_curve.place(x=1164, y=300)
@@ -413,8 +419,8 @@ class Boards(object):
         self.counters.append(0)
 
     def save(self):
-        s = 'new curve.pkl'
-        with open(r'curves\{}'.format(s), 'wb') as f:
+        file_name = self.name_file_text_save.get("1.0", 'end-1c')
+        with open(r'curves\{}'.format(file_name), 'wb') as f:
             list_curves = []
             for seg in range(len(self.curves)):
                 list_points = []
@@ -432,10 +438,11 @@ class Boards(object):
             f.close()
 
     def load(self):
-        f = 'new curve.pkl'
-        with open(r'curves\{}'.format(f), "rb") as input_file:
+        file_name = self.name_file_text_load.get("1.0", 'end-1c')
+        with open(r'curves\{}'.format(file_name), "rb") as input_file:
             list_curves = pickle.load(input_file)
             for seg in range(len(list_curves)):
+                self.counters[seg] = 4
                 if seg == 0:
                     self.curves[seg].start_points[0].x_point = list_curves[seg][0][0][0]
                     self.curves[seg].start_points[0].y_point = list_curves[seg][0][0][1]
@@ -457,7 +464,7 @@ class Boards(object):
                     self.curves[seg].start_points[0].x_point = list_curves[seg][4][0][0]
                     self.curves[seg].start_points[0].y_point = list_curves[seg][4][0][1]
                     self.curves[seg].start_points[0].angle = list_curves[seg][4][1]
-                    self.counters.append(0)
+                    self.counters.append(4)
                     self.ovals_curves = []
                     res = 1000.0
                     self.connect_curves[len(self.connect_curves) - 1] = True
