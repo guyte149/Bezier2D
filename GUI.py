@@ -2,23 +2,25 @@ import pickle
 import time
 from Tkinter import *
 
-import pyautogui as pyautogui
 from PIL import ImageTk, Image
 import numpy as np
 from bezyea import *
 
 
 class PointStart(object):
-    def __init__(self, master, canvas, x, y, num_curve, index):
+    def __init__(self, master, canvas, x, y, num_curve, index, load):
         self.master = master
         self.canvas = canvas
         self.index = index
         self.x = x
         self.y = y
+        self.load = load
         self.angle = 0
         self.x_point = 0
         self.y_point = 0
         self.num_curve = num_curve
+        self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
+                                            fill="blue")
         self.create_window()
 
     def __call__(self, *args, **kwargs):
@@ -46,41 +48,41 @@ class PointStart(object):
         self.text2 = Text(self.master, width=5, height=1)
         self.text2.place(x=self.x + 350, y=self.y)
 
-        text_list = self.text0, self.text1, self.text2
-        for i, text in enumerate(text_list):
-            text.bind('<Tab>', lambda e, text=text, num=i + 1: self.focus_next(text, num))
-            text.bind('<Shift-Tab>', lambda e, text=text, num=i + 1: self.focus_prev(text, num))
-            text.bind('<Return>', lambda e: self.inputs(True))
+        for text in (self.text0, self.text1, self.text2):
+            text.bind('<Tab>', lambda e, text=text: self.focus_next(text))
+            text.bind('<Shift-Tab>', lambda e, text=text: self.focus_prev(text))
 
         self.button = Button(self.master, text="submit", command=self.inputs)
+        self.button.bind('<Return>', lambda e,: self.inputs())
         self.button.place(x=self.x + 425, y=self.y)
 
     @staticmethod
-    def focus_next(text, num):
-        if num % 3 == 0:
-            text.tk_focusNext().tk_focusNext().focus_set()
-        else:
-            text.tk_focusNext().focus_set()
+    def focus_next(text):
+        text.tk_focusNext().focus_set()
         return 'break'
 
     @staticmethod
-    def focus_prev(text, num):
+    def focus_prev(text):
         text.tk_focusPrev().focus_set()
         return 'break'
 
-    def inputs(self, is_backspace=False):
-        if is_backspace:
-            pyautogui.press('backspace')
+    def inputs(self):
         input = []
-        if self.x_point == 0 and self.y_point == 0:
+        self.canvas.delete(self.oval)
+        # np.core.multiarray
+        # if self.x_point == 0 and self.y_point == 0:
+        if not self.load:
             input.append(self.text0.get("1.0", 'end-1c'))
             input.append(self.text1.get("1.0", 'end-1c'))
             input.append(self.text2.get("1.0", 'end-1c'))
             # self.x_point = float(input[0])
-            self.x_point = float(input[0]) * 55.528
-            self.y_point = float(input[1]) * 55.528
-            # self.y_point = float(input[1])
+            self.x_point = float(input[0])
+            self.y_point = float(input[1])
             self.angle = float(input[2])
+        self.load = False
+        self.x_point *= 55.528
+        self.y_point *= 55.528
+        # self.y_point = float(input[1])
         self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
                                             fill="blue")
 
@@ -139,7 +141,7 @@ class Point(object):
 
 
 class Curves(object):
-    def __init__(self, master, canvas, first, place, num_curve):
+    def __init__(self, master, canvas, first, place, num_curve, load):
         self.master = master
         self.canvas = canvas
         self.canvas.focus_set()
@@ -151,8 +153,8 @@ class Curves(object):
         self.start_points = []
         self.first = first
         if self.first:
-            self.start_points.append(PointStart(self.master, self.canvas, 0, place - 25, num_curve, 0))
-        self.start_points.append(PointStart(self.master, self.canvas, 0, place, num_curve, 1))
+            self.start_points.append(PointStart(self.master, self.canvas, 0, place - 25, num_curve, 0, load))
+        self.start_points.append(PointStart(self.master, self.canvas, 0, place, num_curve, 1, load))
         self.points = [Point(self.master, self.canvas, "red", True, 1, 10 + 1 * 100, 10)]
         self.choose_points()
         self.finish = False
@@ -310,7 +312,7 @@ class Boards(object):
         self.num_curve = 0
         self.counters = [0]
 
-        self.curves = [Curves(self.master, self.canvas, True, self.place, self.num_curve)]
+        self.curves = [Curves(self.master, self.canvas, True, self.place, self.num_curve, False)]
         # self.curves.append(Curves(self.master))
         # self.curves[0].choose_points()
         # self.curves[0].create_curve()
@@ -403,7 +405,7 @@ class Boards(object):
         self.place += 25
         self.connect_curves[len(self.connect_curves) - 1] = True
         self.connect_curves.append(False)
-        self.curves.append(Curves(self.master, self.canvas, False, self.place, self.num_curve))
+        self.curves.append(Curves(self.master, self.canvas, False, self.place, self.num_curve, False))
         self.ovals_curves = []
         for t in range(0, 1000, 1):
             self.ovals_curves.append(self.canvas.create_oval(10, 10, 10, 10, fill="blue"))
@@ -417,14 +419,14 @@ class Boards(object):
             for seg in range(len(self.curves)):
                 list_points = []
                 if seg == 0:
-                    list_points.append(self.curves[seg].start_points[0]())
+                    list_points.append([self.curves[seg].start_points[0](), self.curves[seg].start_points[0].angle])
                     for point in range(len(self.curves[seg].points)):
                         list_points.append(self.curves[seg].points[point]())
-                    list_points.append(self.curves[seg].start_points[1]())
+                    list_points.append([self.curves[seg].start_points[1](), self.curves[seg].start_points[1].angle])
                 else:
                     for point in range(len(self.curves[seg].points)):
                         list_points.append(self.curves[seg].points[point]())
-                    list_points.append(self.curves[seg].start_points[0]())
+                    list_points.append([self.curves[seg].start_points[0](), self.curves[seg].start_points[0].angle])
                 list_curves.append(list_points)
             pickle.dump(list_curves, f)
             f.close()
@@ -435,27 +437,40 @@ class Boards(object):
             list_curves = pickle.load(input_file)
             for seg in range(len(list_curves)):
                 if seg == 0:
-                    self.curves[seg].start_points[0].x_point = list_curves[seg][0][0]
-                    self.curves[seg].start_points[0].y_point = list_curves[seg][0][1]
+                    self.curves[seg].start_points[0].x_point = list_curves[seg][0][0][0]
+                    self.curves[seg].start_points[0].y_point = list_curves[seg][0][0][1]
+                    self.curves[seg].start_points[0].angle = list_curves[seg][0][1]
                     for i in range(1, 5, 1):
                         self.curves[seg].points[i - 1].change_place_for_input(list_curves[seg][i][0],
                                                                               list_curves[seg][i][1])
-                    self.curves[seg].start_points[1].x_point = list_curves[seg][5][0]
-                    self.curves[seg].start_points[1].y_point = list_curves[seg][5][1]
+                    self.curves[seg].start_points[1].x_point = list_curves[seg][5][0][0]
+                    self.curves[seg].start_points[1].y_point = list_curves[seg][5][0][1]
+                    self.curves[seg].start_points[1].angle = list_curves[seg][5][1]
                 else:
-                    self.curves.append(Curves(self.master, self.canvas, False, self.place, self.num_curve))
+                    self.num_curve += 1
+                    self.curves.append(Curves(self.master, self.canvas, False, self.place, self.num_curve, True))
                     # self.curves[seg].start_points[0].x_point = list_curves[seg - 1][5][0]
                     # self.curves[seg].start_points[0].y_point = list_curves[seg - 1][5][1]
-                    for i in range(1, 5, 1):
-                        self.curves[seg].points[i - 1].change_place_for_input(list_curves[seg][i][0],
-                                                                              list_curves[seg][i][1])
-                    self.curves[seg].start_points[0].x_point = list_curves[seg][5][0]
-                    self.curves[seg].start_points[0].y_point = list_curves[seg][5][1]
-                self.counters.append(0)
+                    for i in range(0, 4, 1):
+                        self.curves[seg].points[i].change_place_for_input(list_curves[seg][i][0],
+                                                                          list_curves[seg][i][1])
+                    self.curves[seg].start_points[0].x_point = list_curves[seg][4][0][0]
+                    self.curves[seg].start_points[0].y_point = list_curves[seg][4][0][1]
+                    self.curves[seg].start_points[0].angle = list_curves[seg][4][1]
+                    self.counters.append(0)
+                    self.ovals_curves = []
+                    res = 1000.0
+                    self.connect_curves[len(self.connect_curves) - 1] = True
+                    self.connect_curves.append(False)
+                    for t in range(0, int(res), 1):
+                        self.ovals_curves.append(self.canvas.create_oval(10, 10, 10, 10, fill="blue"))
+                    self.list_ovals_curves.append(self.ovals_curves)
+
                 print self.curves[seg].start_points[0]()
                 print list_curves[seg][0]
                 # print self.curves[seg].start_points[0].y_point
                 self.place += 25
+            self.create_canvas()
 
     # def save(self):
     #     s = 'new curve.pkl'
