@@ -501,7 +501,7 @@ class Boards(object):
 master = Tk()
 master.attributes('-fullscreen', True)
 
-path = "field.png"
+path = "filed2019big.png"
 image = Image.open(path)
 # image = image.resize((1000, 406), Image.ANTIALIAS)
 image = image.resize((919, 457), Image.ANTIALIAS)
