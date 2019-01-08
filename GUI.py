@@ -479,6 +479,25 @@ class Boards(object):
                 self.place += 25
             self.create_canvas()
 
+    def get_set_points(self):
+        list_curves = []
+        for seg in range(len(self.curves)):
+            list_set_points = []
+            if seg == 0:
+                list_set_points.append(self.curves[seg].start_points[0]())
+                for i in range(0, 5, 1):
+                    list_set_points.append(self.curves[seg].points[i])
+                list_set_points.append(self.curves[seg].start_points[1]())
+
+                list_curves.append(list_set_points)
+            else:
+                list_set_points.append(self.curves[seg - 1].start_points[1]())
+                for i in range(0, 5, 1):
+                    list_set_points.append(self.curves[seg].points[i])
+                list_set_points.append(self.curves[seg].start_points[0]())
+                list_curves.append(list_curves)
+        return list_curves
+
     # def save(self):
     #     s = 'new curve.pkl'
     #     data = self.curves
