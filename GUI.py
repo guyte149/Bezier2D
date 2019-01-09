@@ -406,6 +406,12 @@ class Boards(object):
         self.button_add_curve = Button(self.master, text="connect curve", command=self.button_connect_curve)
         self.button_add_curve.place(x=1164, y=300)
 
+        self.set_trajectory_button = Button(self.master, text="set trajectory", command=self.get_set_points)
+        self.set_trajectory_button.place(x=1164, y=350)
+
+        self.set_trajectory_text = Text(self.master, width=10, height=1)
+        self.set_trajectory_text.place(x=1164, y=400)
+
     def button_connect_curve(self):
         self.num_curve += 1
         self.place += 25
@@ -485,18 +491,21 @@ class Boards(object):
             list_set_points = []
             if seg == 0:
                 list_set_points.append(self.curves[seg].start_points[0]())
-                for i in range(0, 5, 1):
-                    list_set_points.append(self.curves[seg].points[i])
+                for i in range(0, 4, 1):
+                    list_set_points.append(self.curves[seg].points[i]())
                 list_set_points.append(self.curves[seg].start_points[1]())
 
                 list_curves.append(list_set_points)
             else:
                 list_set_points.append(self.curves[seg - 1].start_points[1]())
-                for i in range(0, 5, 1):
-                    list_set_points.append(self.curves[seg].points[i])
+                for i in range(0, 4, 1):
+                    list_set_points.append(self.curves[seg].points[i]())
                 list_set_points.append(self.curves[seg].start_points[0]())
                 list_curves.append(list_curves)
-        return list_curves
+        file_name = self.set_trajectory_text.get("1.0", 'end-1c')
+        with open(r'curves\{}'.format(file_name), 'wb') as f:
+            pickle.dump(list_curves, f)
+            f.close()
 
     # def save(self):
     #     s = 'new curve.pkl'
