@@ -67,8 +67,12 @@ class PointStart(object):
         return 'break'
 
     @staticmethod
-    def focus_prev(text):
-        text.tk_focusPrev().focus_set()
+    def focus_prev(text, num):
+        print num
+        if num == 1:
+            text.tk_focusPrev().tk_focusPrev().focus_set()
+        else:
+            text.tk_focusPrev().focus_set()
         return 'break'
 
     def inputs(self, is_backspace):
