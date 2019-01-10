@@ -475,6 +475,10 @@ class Boards(object):
         max_v = 3
         width = 0.6
         dt = 0.01
+
+        change_x = -self.curves[0].start_points[0]()[0] / 55.528
+        change_y = -self.curves[0].start_points[0]()[1] / 55.528
+
         list_curves = []
         # for seg in range(len(self.curves)):
         #     list_set_points = []
@@ -492,9 +496,23 @@ class Boards(object):
         #         list_set_points.append(self.curves[seg].start_points[0]())
         #         list_curves.append(list_curves)
         for seg in range(len(self.curves)):
-            curve = Bezier(self.curves[seg].curve.p0 / 55.528, self.curves[seg].curve.p1 / 55.528,
-                           self.curves[seg].curve.p2 / 55.528, self.curves[seg].curve.p3 / 55.528,
-                           self.curves[seg].curve.p4 / 55.528, self.curves[seg].curve.p5 / 55.528)
+            p0 = self.curves[seg].curve.p0 / 55.528
+            p1 = self.curves[seg].curve.p1 / 55.528
+            p2 = self.curves[seg].curve.p2 / 55.528
+            p3 = self.curves[seg].curve.p3 / 55.528
+            p4 = self.curves[seg].curve.p4 / 55.528
+            p5 = self.curves[seg].curve.p5 / 55.528
+
+            for p in (p0, p1, p2, p3, p4, p5):
+                p[0] += change_x
+                p[1] += change_y
+
+            # curve = Bezier(self.curves[seg].curve.p0 / 55.528, self.curves[seg].curve.p1 / 55.528,
+            #                self.curves[seg].curve.p2 / 55.528, self.curves[seg].curve.p3 / 55.528,
+            #                self.curves[seg].curve.p4 / 55.528, self.curves[seg].curve.p5 / 55.528)
+
+            curve = Bezier(p0, p1, p2, p3, p4, p5)
+
             list_curves.append(curve)
 
         path = Path(list_curves)
