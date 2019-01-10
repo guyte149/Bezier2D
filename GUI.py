@@ -69,20 +69,17 @@ class PointStart(object):
     def inputs(self):
         input = []
         self.canvas.delete(self.oval)
-        # np.core.multiarray
         # if self.x_point == 0 and self.y_point == 0:
         if not self.load:
             input.append(self.text0.get("1.0", 'end-1c'))
             input.append(self.text1.get("1.0", 'end-1c'))
             input.append(self.text2.get("1.0", 'end-1c'))
-            # self.x_point = float(input[0])
             self.x_point = float(input[0])
             self.y_point = float(input[1])
             self.angle = float(input[2])
         self.load = False
         self.x_point *= 55.528
         self.y_point *= 55.528
-        # self.y_point = float(input[1])
         self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
                                             fill="blue")
 
@@ -92,11 +89,9 @@ class PointStart(object):
 class Point(object):
     def __init__(self, master, canvas, color, to_stop, index, last_x, last_y):
         self.master = master
-        # self.master.bind("<Key>", self.stop)
         self.canvas = canvas
         self.color = color
         self.to_stop = to_stop
-        # self.canvas.bind("<Key>", self.stop)
         self.master.bind("<Button-1>", self.mouse_clicked)
         self.index = index
         self.x = 10 + self.index * 100
@@ -107,19 +102,7 @@ class Point(object):
         self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
 
     def __call__(self, *args, **kwargs):
-        # if self.x == self.last_x and self.y == self.last_y:
-        #     self.after = False
-        #     # self.after = True
-        # else:
-        #     self.after = True
         return np.array([float(self.x), float(self.y)])
-
-    # def stop(self, event):
-    #     if event.char == 'a':
-    #         self.master.unbind("<Button-1>")
-    #         self.master.unbind("<Key>")
-    #         self.to_stop = True
-    #         self.after = True
 
     def mouse_clicked(self, event):
         self.canvas.delete(self.oval)
@@ -127,7 +110,6 @@ class Point(object):
         self.y = event.y
         self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
         self.master.unbind("<Button-1>")
-        # self.master.unbind("<Key>")
         self.to_stop = True
         self.after = True
         board_curve.create_canvas()
@@ -179,15 +161,15 @@ class Curves(object):
 
     def create_curve(self, first):
         if not first:
-            self.curve = QuanticBezierCurve(self.start_points[0](), self.points[0](), self.points[1](),
-                                            self.points[2](), self.points[3](), self.start_points[1]())
+            self.curve = Bezier(self.start_points[0](), self.points[0](), self.points[1](),
+                                self.points[2](), self.points[3](), self.start_points[1]())
         else:
-            self.curve = QuanticBezierCurve.create_curve(self.start_points[0](), self.start_points[0].angle,
-                                                         self.start_points[1](), self.start_points[1].angle)
-            self.points[0].change_place_for_input(self.curve.c0[0], self.curve.c0[1])
-            self.points[1].change_place_for_input(self.curve.c1[0], self.curve.c1[1])
-            self.points[2].change_place_for_input(self.curve.c2[0], self.curve.c2[1])
-            self.points[3].change_place_for_input(self.curve.c3[0], self.curve.c3[1])
+            self.curve = Bezier.create_curve(self.start_points[0](), self.start_points[0].angle,
+                                             self.start_points[1](), self.start_points[1].angle)
+            self.points[0].change_place_for_input(self.curve.p1[0], self.curve.p1[1])
+            self.points[1].change_place_for_input(self.curve.p2[0], self.curve.p2[1])
+            self.points[2].change_place_for_input(self.curve.p3[0], self.curve.p3[1])
+            self.points[3].change_place_for_input(self.curve.p4[0], self.curve.p4[1])
         return self.curve
 
     def connect_curve(self, curve0, first):
@@ -199,19 +181,19 @@ class Curves(object):
         c3 = self.points[3]()
 
         if first:
-            new_curve = QuanticBezierCurve.create_curve(curve0.curve.p1,
-                                                        curve0.start_points[len(curve0.start_points) - 1].angle,
-                                                        self.start_points[0](), self.start_points[0].angle)
-            c2 = new_curve.c2
-            c3 = new_curve.c3
+            new_curve = Bezier.create_curve(curve0.curve.p5,
+                                            curve0.start_points[len(curve0.start_points) - 1].angle,
+                                            self.start_points[0](), self.start_points[0].angle)
+            c2 = new_curve.p3
+            c3 = new_curve.p4
 
-        c0 = 2 * curve0.curve.p1 - curve0.curve.c3
-        c1 = curve0.curve.c2 + 2 * c0 - 2 * curve0.curve.c3
+        c0 = 2 * curve0.curve.p5 - curve0.curve.p4
+        c1 = curve0.curve.p3 + 2 * c0 - 2 * curve0.curve.p4
 
-        self.curve = QuanticBezierCurve(curve0.curve.p1, c0, c1, c2, c3, self.start_points[0]())
+        self.curve = Bezier(curve0.curve.p5, c0, c1, c2, c3, self.start_points[0]())
         return curve0
 
-    def correct_angle(self, curve_before, to_work):
+    def correct_angle(self, to_work):
         if not to_work:
             if self.first:
                 if self.start_points[0].angle != 90:
@@ -313,9 +295,6 @@ class Boards(object):
         self.counters = [0]
 
         self.curves = [Curves(self.master, self.canvas, True, self.place, self.num_curve, False)]
-        # self.curves.append(Curves(self.master))
-        # self.curves[0].choose_points()
-        # self.curves[0].create_curve()
         self.canvas_on = False
 
         self.connect_curves = []
@@ -330,8 +309,6 @@ class Boards(object):
         for t in range(0, 1000, 1):
             self.ovals_curves.append(self.canvas.create_oval(10, 10, 10, 10, fill="blue"))
         self.list_ovals_curves = [self.ovals_curves]
-
-        # self.create_canvas()
 
     def __call__(self, *args, **kwargs):
         t = args[0]
@@ -354,21 +331,21 @@ class Boards(object):
 
         for seg in xrange(0, len(self.curves), 1):
             if seg == 0:
-                self.curves[seg].correct_angle(None, self.counters[0] <= 3)
+                self.curves[seg].correct_angle(self.counters[0] <= 3)
                 self.curves[seg].create_curve(self.counters[0] <= 3)
             else:
-                self.curves[seg].correct_angle(self.curves[seg - 1], self.counters[seg] <= 2)
+                self.curves[seg].correct_angle(self.counters[seg] <= 2)
                 # self.curves[seg].points[0].after = False
                 self.curves[seg - 1] = self.curves[seg].connect_curve(self.curves[seg - 1], self.counters[seg] <= 2)
             # for i in range(0, 4, 1):
-            self.curves[seg].points[0].change_place_for_input(self.curves[seg].curve.c0[0],
-                                                              self.curves[seg].curve.c0[1])
-            self.curves[seg].points[1].change_place_for_input(self.curves[seg].curve.c1[0],
-                                                              self.curves[seg].curve.c1[1])
-            self.curves[seg].points[2].change_place_for_input(self.curves[seg].curve.c2[0],
-                                                              self.curves[seg].curve.c2[1])
-            self.curves[seg].points[3].change_place_for_input(self.curves[seg].curve.c3[0],
-                                                              self.curves[seg].curve.c3[1])
+            self.curves[seg].points[0].change_place_for_input(self.curves[seg].curve.p1[0],
+                                                              self.curves[seg].curve.p1[1])
+            self.curves[seg].points[1].change_place_for_input(self.curves[seg].curve.p2[0],
+                                                              self.curves[seg].curve.p2[1])
+            self.curves[seg].points[2].change_place_for_input(self.curves[seg].curve.p3[0],
+                                                              self.curves[seg].curve.p3[1])
+            self.curves[seg].points[3].change_place_for_input(self.curves[seg].curve.p4[0],
+                                                              self.curves[seg].curve.p4[1])
 
         for seg in xrange(0, len(self.curves), 1):
             for t in xrange(0, int(res), 1):
@@ -462,8 +439,6 @@ class Boards(object):
                 else:
                     self.num_curve += 1
                     self.curves.append(Curves(self.master, self.canvas, False, self.place, self.num_curve, True))
-                    # self.curves[seg].start_points[0].x_point = list_curves[seg - 1][5][0]
-                    # self.curves[seg].start_points[0].y_point = list_curves[seg - 1][5][1]
                     for i in range(0, 4, 1):
                         self.curves[seg].points[i].change_place_for_input(list_curves[seg][i][0],
                                                                           list_curves[seg][i][1])
@@ -481,63 +456,89 @@ class Boards(object):
 
                 print self.curves[seg].start_points[0]()
                 print list_curves[seg][0]
-                # print self.curves[seg].start_points[0].y_point
                 self.place += 25
             self.create_canvas()
 
     def get_set_points(self):
+        max_ar = 3
+        max_at = 3
+        max_v = 3
+        width = 0.6
+        dt = 0.01
         list_curves = []
+        # for seg in range(len(self.curves)):
+        #     list_set_points = []
+        #     if seg == 0:
+        #         list_set_points.append(self.curves[seg].start_points[0]())
+        #         for i in range(0, 4, 1):
+        #             list_set_points.append(self.curves[seg].points[i]())
+        #         list_set_points.append(self.curves[seg].start_points[1]())
+        #
+        #         list_curves.append(list_set_points)
+        #     else:
+        #         list_set_points.append(self.curves[seg - 1].start_points[1]())
+        #         for i in range(0, 4, 1):
+        #             list_set_points.append(self.curves[seg].points[i]())
+        #         list_set_points.append(self.curves[seg].start_points[0]())
+        #         list_curves.append(list_curves)
         for seg in range(len(self.curves)):
-            list_set_points = []
-            if seg == 0:
-                list_set_points.append(self.curves[seg].start_points[0]())
-                for i in range(0, 4, 1):
-                    list_set_points.append(self.curves[seg].points[i]())
-                list_set_points.append(self.curves[seg].start_points[1]())
+            curve = Bezier(self.curves[seg].curve.p0 / 55.528, self.curves[seg].curve.p1 / 55.528,
+                           self.curves[seg].curve.p2 / 55.528, self.curves[seg].curve.p3 / 55.528,
+                           self.curves[seg].curve.p4 / 55.528, self.curves[seg].curve.p5 / 55.528)
+            list_curves.append(curve)
 
-                list_curves.append(list_set_points)
-            else:
-                list_set_points.append(self.curves[seg - 1].start_points[1]())
-                for i in range(0, 4, 1):
-                    list_set_points.append(self.curves[seg].points[i]())
-                list_set_points.append(self.curves[seg].start_points[0]())
-                list_curves.append(list_curves)
-        file_name = self.set_trajectory_text.get("1.0", 'end-1c')
-        with open(r'curves\{}'.format(file_name), 'wb') as f:
-            pickle.dump(list_curves, f)
-            f.close()
+        path = Path(list_curves)
+        # path.draw_path()
+        # master.destroy()
 
-    # def save(self):
-    #     s = 'new curve.pkl'
-    #     data = self.curves
-    #     with open(r'curves\{}'.format(s), "wb") as output_file:
-    #         pickle.dump(data, output_file)
-    #
-    # def load(self):
-    #     s = 'new curve.pkl'
-    #     with open(r'curves\{}'.format(s), "rb") as input_file:
-    #         e = pickle.load(input_file)
-    #         print e
+        # calculate the points along the path, just for drawing it
+        us = np.arange(0, path.end_u, 0.01)
+        ps = path.call_multi(us)
+
+        # create the TrajectoryGenerator object
+        generator = TrajectoryGenerator(max_v, max_at, max_ar, width)
+
+        # generate the trajectories, one is (time, path parameter u) and the other is (time, velocity)
+        pos_traj, v_traj = generator.generate_trajectory(path)
+
+        # get the actual points along the trajectory so we can draw them nicely
+        points_traj = path.call_multi(pos_traj.T[1])
+        angles_traj = path.get_angles(pos_traj.T[1])
+
+        points_time_traj = np.concatenate((np.row_stack(pos_traj.T[0]), points_traj), axis=1)
+
+        angles_traj = np.reshape(angles_traj, (angles_traj.shape[0], 1))
+        x_time_traj = np.concatenate((points_time_traj, angles_traj), axis=1)
+
+        points_traj = points_traj[::30]  # take only some of the points so they wont be too close to each other
+
+        # draw the path and the trajectory
+        plt.figure()
+
+        # draw the path
+        plt.subplot(121)
+        plt.axis('equal')
+        plt.plot(ps.T[0], ps.T[1])
+        plt.scatter(points_traj.T[0], points_traj.T[1], c='orange', s=10)
+
+        # draw the velocity profile
+        plt.subplot(122)
+        plt.plot(v_traj.T[0], v_traj.T[1])
+
+        plt.show()
+        # file_name = self.set_trajectory_text.get("1.0", 'end-1c')
+        # with open(r'curves\{}'.format(file_name), 'wb') as f:
+        #     pickle.dump(list_curves, f)
+        #     f.close()
 
 
-# def c(event):
-#     print 1
-#     board_curve.canvas.create_oval(event.x, event.y, event.x + 10, event.y + 10, fill="green")
-
-
-# inputs = []
 master = Tk()
 master.attributes('-fullscreen', True)
 
 path = "filed2019big.png"
 image = Image.open(path)
-# image = image.resize((1000, 406), Image.ANTIALIAS)
 image = image.resize((919, 457), Image.ANTIALIAS)
 img = ImageTk.PhotoImage(image)
-
-# l = Label(master)
-# l.pack(expand=YES, fill=BOTH)
-# l.bind('<B1-Motion>', c)
 
 board_curve = Boards(0, 425, master, img)
 

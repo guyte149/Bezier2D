@@ -364,3 +364,216 @@ def __str__(self):
     return 'p0- {} \nc0- {} \nc1- {} \nc2- {} \nc3- {} \np1- {} \nlength {}'.format(self.p0, self.c0, self.c1, self.c2,
                                                                                     self.c3, self.p1,
                                                                                     self.get_curve_length())
+
+
+class Bezier(object):
+    def __init__(self, p0, p1, p2, p3, p4, p5):
+        self.p0 = p0
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
+        self.p4 = p4
+        self.p5 = p5
+
+        nodes = np.array([p0, p1, p2, p3, p4, p5]).T
+
+        # we use the bezier library because it can calculate multiple points together much faster than python
+        # the backend of the library is written in C
+        self.bezier_lib = bezier.Curve(nodes, degree=5)
+
+    def call_multi(self, us):
+        """
+        :param us: a vector of us (the path parameter)
+        :return: a vector of points that correspond to the u vector
+        """
+
+        return self.bezier_lib.evaluate_multi(us).T
+        # return self.bezier_lib.evaluate_multi(us)[0].T
+
+    def __call__(self, u):
+        """"
+        :param u: path parameter
+        :return: the point on the path
+        """
+        return self.bezier_lib.evaluate(u)
+
+    def bezier_derivative(self, t):
+        omt = 1 - t
+        return 5 * t * t * t * t * (self.p5 - self.p4) + 20 * omt * t * t * t * (self.p4 - self.p3) + (
+                30 * omt * omt * t * t * (self.p3 - self.p2)) + 20 * omt * omt * omt * t * (self.p2 - self.p1) + (
+                       5 * omt * omt * omt * omt * omt * (self.p1 - self.p0))
+
+    def second_bezier_derivative(self, t):
+        return 20 * (self.p5 - 5 * self.p4 + 10 * self.p3 - 10 * self.p2 + 5 * self.p1 - self.p0) * t * t * t + (
+                15 * (4 * self.p4 - 16 * self.p3 + 24 * self.p2 - 16 * self.p1 + 4 * self.p0) * t * t) + (
+                       10 * (6 * self.p3 - 18 * self.p2 + 18 * self.p1 - 6 * self.p0) * t) + (
+                       20 * self.p2 - 40 * self.p1 + 20 * self.p0)
+
+    def get_length(self):
+        """
+        use the library to get the total length of the path.
+        this is also faster than doing it in python
+        :return: the total length of the path
+        """
+        return self.bezier_lib.length
+
+    def get_curvature(self, u):
+        fd = self.bezier_derivative(u)
+        sd = self.second_bezier_derivative(u)
+
+        k = ((fd[0] * sd[1]) - (fd[1] * sd[0])) \
+            / np.power((fd[0] ** 2) + (fd[1] ** 2), 1.5)
+
+        return k
+
+    @staticmethod
+    def create_curve(p0, ang0, p1, ang1):
+        l = np.linalg.norm(p1 - p0)
+        u = 0.275 * l
+
+        v0 = np.array([np.cos(np.deg2rad(ang0)), np.sin(np.deg2rad(ang0))])
+        v1 = np.array([np.cos(np.deg2rad(ang1)), np.sin(np.deg2rad(ang1))])
+
+        value_x = (p1[0] - p0[0]) * 0.25
+        # value_y = p1[1] - p0[1]
+
+        c0 = p0 + u * v0
+        c1 = np.array([c0[0] + value_x, c0[1] + c0[1] / l])
+        c3 = p1 - u * v1
+        c2 = np.array([c3[0] - value_x, c3[1] + c3[1] * -v1[1] / (l * l)])
+        # print c1[1], c2[1]
+
+        return Bezier(p0, c0, c1, c2, c3, p1)
+
+    def find_turning_points(self):
+        """
+        a hackish way to find the points of maximum curvature.
+        there should be a faster more correct and accurate way of doing this
+        :return: a vector of us representing the turning points along the path
+        """
+        du = 0.005
+        turning_points = []
+
+        for u in np.arange(0 + du, 1 - du, du):
+            prev_k = np.abs(self.get_curvature(u - du))
+            k = np.abs(self.get_curvature(u))
+            next_k = np.abs(self.get_curvature(u + du))
+
+            # check if the point's curvature is bigger than its neighbors, if it is than it's a maximum
+            if prev_k < k > next_k:
+                turning_points.append(u)
+
+        return np.array(turning_points)
+
+    def get_angle(self, u):
+        v = self.bezier_derivative(u)
+        return np.angle(v[0] + v[1] * 1j)
+
+    def get_angles(self, us):
+        return np.row_stack(np.array([self.get_angle(u) for u in us]))
+
+
+class Path(object):
+    def __init__(self, curves):
+        self.curves = curves
+        self.end_u = len(curves)
+
+    def __call__(self, u):
+        return self.curves[int(u)](u - int(u))
+
+    def get_all_points(self, du):
+        u_range = np.arange(0, 1, du)
+        range_points = None
+        for c in self.curves:
+            if range_points is None:
+                range_points = c.call_multi(u_range)
+            else:
+                range_points = np.concatenate((range_points, c.call_multi(u_range)))
+        range_points = np.array(range_points)
+        return range_points
+
+    def call_multi(self, us):
+        # organized_us = []
+        # int_first_u = int(us[0])
+        # int_last_u = int(us[len(us) - 1])
+        #
+        # if us[len(us) - 1] <= float(int_first_u + 1):
+        #     # calculate the only one
+        #     organized_us.append(TrajectoryGenerator.get_us_subset(us[0], us[len(us) - 1], du))
+        #
+        # else:
+        #     # calculate first one
+        #     organized_us.append(TrajectoryGenerator.get_us_subset(us[0], float(int_first_u + 1), du))
+        #
+        #     # calculate middle ones
+        #     for i in xrange(int_first_u + 1, int_last_u):
+        #         organized_us.append(TrajectoryGenerator.get_us_subset(float(i) + du, i + 1, du))
+        #
+        #     # calculate last one
+        #     organized_us.append(TrajectoryGenerator.get_us_subset(float(int_last_u) + du, us[len(us) - 1], du))
+        #
+        # calculated_us = self.curves[int(organized_us[0][0])].call_multi(organized_us[0])
+        # for i in xrange(1, len(organized_us)):
+        #     print "calc_u = {}, call multi = {}".format(calculated_us.shape,
+        #                                                 self.curves[int(organized_us[i][0])].call_multi(
+        #                                                     organized_us[i]).shape)
+        #     np.concatenate(calculated_us, self.curves[int(organized_us[i][0])].call_multi(organized_us[i]))
+        return np.array([self(u).flatten() for u in us])
+
+    def bezier_derivative(self, t):
+        return self.curves[int(t)].bezier_derivative(t - int(t))
+
+    def second_bezier_derivative(self, t):
+        return self.curves[int(t)].second_bezier_derivative(t - int(t))
+
+    def get_length(self):
+        length = 0
+        for bezier in self.curves:
+            length += bezier.get_length()
+
+        return length
+
+    def get_curvature(self, u):
+        return self.curves[int(u)].get_curvature(u - int(u))
+
+    def find_turning_points(self):
+        tps = self.curves[0].find_turning_points()
+        for i in xrange(1, len(self.curves)):
+            np.concatenate((tps, self.curves[i].find_turning_points()))
+        return tps
+
+    def get_angle(self, u):
+        return self.curves[int(u)].get_angle(u - int(u))
+
+    def get_angles(self, us):
+        # organized_us = []
+        # int_first_u = int(us[0])
+        # int_last_u = int(us[len(us) - 1])
+        #
+        # if us[len(us) - 1] <= float(int_first_u + 1):
+        #     # calculate the only one
+        #     organized_us.append(TrajectoryGenerator.get_us_subset(us[0], us[len(us) - 1]), du)
+        #
+        # else:
+        #     # calculate first one
+        #     organized_us.append(TrajectoryGenerator.get_us_subset(us[0], float(int_first_u + 1), du))
+        #
+        #     # calculate middle ones
+        #     for i in xrange(int_first_u + 1, int_last_u):
+        #         organized_us.append(TrajectoryGenerator.get_us_subset(float(i) + du, i + 1, du))
+        #
+        #     # calculate last one
+        #     organized_us.append(TrajectoryGenerator.get_us_subset(float(int_last_u) + du, us[len(us) - 1], du))
+        #
+        # calculated_angles = np.array(self.get_angle(organized_us[0][0]))
+        # for i in xrange(1, len(organized_us[0])):
+        #     np.concatenate(calculated_angles, np.array(self.get_angle(i)))
+        #
+        # angles = calculated_angles
+        # for i in xrange(1, len(organized_us)):
+        #     for u in i:
+        #         np.concatenate(calculated_angles, self.get_angle(u))
+        #     np.concatenate(angles, np.array(calculated_angles))
+        #
+        # return np.row_stack(angles)
+        return np.array([self.get_angle(u) for u in us])
