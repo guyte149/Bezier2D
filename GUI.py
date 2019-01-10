@@ -2,6 +2,7 @@ import pickle
 import time
 from Tkinter import *
 
+import keyboard
 from PIL import ImageTk, Image
 import numpy as np
 from bezyea import *
@@ -48,17 +49,21 @@ class PointStart(object):
         self.text2 = Text(self.master, width=5, height=1)
         self.text2.place(x=self.x + 350, y=self.y)
 
-        for text in (self.text0, self.text1, self.text2):
-            text.bind('<Tab>', lambda e, text=text: self.focus_next(text))
-            text.bind('<Shift-Tab>', lambda e, text=text: self.focus_prev(text))
+        text_list = self.text0, self.text1, self.text2
+        for i, text in enumerate(text_list):
+            text.bind('<Tab>', lambda e, text=text, num=i + 1: self.focus_next(text, num))
+            text.bind('<Shift-Tab>', lambda e, text=text, num=i + 1: self.focus_prev(text, num))
+            text.bind('<Return>', lambda e: self.inputs(True))
 
         self.button = Button(self.master, text="submit", command=self.inputs)
-        self.button.bind('<Return>', lambda e,: self.inputs())
         self.button.place(x=self.x + 425, y=self.y)
 
     @staticmethod
-    def focus_next(text):
-        text.tk_focusNext().focus_set()
+    def focus_next(text, num):
+        if num % 3 == 0:
+            text.tk_focusNext().tk_focusNext().focus_set()
+        else:
+            text.tk_focusNext().focus_set()
         return 'break'
 
     @staticmethod
@@ -66,7 +71,9 @@ class PointStart(object):
         text.tk_focusPrev().focus_set()
         return 'break'
 
-    def inputs(self):
+    def inputs(self, is_backspace):
+        if is_backspace:
+            keyboard.press_and_release('backspace')
         input = []
         self.canvas.delete(self.oval)
         # if self.x_point == 0 and self.y_point == 0:
