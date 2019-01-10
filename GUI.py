@@ -68,7 +68,6 @@ class PointStart(object):
 
     @staticmethod
     def focus_prev(text, num):
-        print num
         if num == 1:
             text.tk_focusPrev().tk_focusPrev().focus_set()
         else:
@@ -331,10 +330,10 @@ class Boards(object):
         messeges_y = []
         for i in range(1, 17, 1):
             messeges_x.append(Message(self.master, text=i))
-            messeges_x[i - 1].place(x=i * 55 + 20, y=465)
+            messeges_x[i - 1].place(x=i * 55 + 12, y=465)
         for i in range(1, 9, 1):
             messeges_y.append(Message(self.master, text=i))
-            messeges_y[i - 1].place(x=0, y=i * 55 + 5)
+            messeges_y[i - 1].place(x=0, y=i * 55)
 
     def create_canvas(self, res=1000.0):
         for i in range(len(self.counters)):
