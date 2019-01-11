@@ -289,7 +289,7 @@ class Boards(object):
         self.y = y
         self.master = master
 
-        self.colors = ["blue", "green", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
+        self.colors = ["white", "aqua", "yellow", "pink", "orange", "grey", "brown", "purple", "cyan",
                        "magenta", "gold", "silver", "turquoise", "salmon", "black", "red", "green", "yellow",
                        "pink", "orange", "grey", "brown", "purple"]
 
@@ -360,11 +360,11 @@ class Boards(object):
         for seg in xrange(0, len(self.curves), 1):
             for t in xrange(0, int(res), 1):
                 self.canvas.delete(self.list_ovals_curves[seg][t])
-                self.list_ovals_curves[seg][t] = self.canvas.create_oval(int(self(t / res, seg)[0]),
-                                                                         int(self(t / res, seg)[1]),
-                                                                         int(self(t / res, seg)[0]),
-                                                                         int(self(t / res, seg)[1]),
-                                                                         fill=self.colors[seg])
+                self.list_ovals_curves[seg][t] = self.canvas.create_oval(int(self(t / res, seg)[0]) - 1,
+                                                                         int(self(t / res, seg)[1]) - 1,
+                                                                         int(self(t / res, seg)[0]) + 1,
+                                                                         int(self(t / res, seg)[1]) + 1,
+                                                                         fill=self.colors[seg], outline="")
 
     def change_point(self, event):
         for seg in xrange(0, len(self.curves), 1):
