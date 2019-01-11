@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Bezier2D.iml" filepath="$PROJECT_DIR$/.idea/Bezier2D.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Bezier2D-master.iml" filepath="$PROJECT_DIR$/.idea/Bezier2D-master.iml" />
     </modules>
   </component>
 </project>
