@@ -490,6 +490,8 @@ class Boards(object):
         dt = 0.01
 
         angle = self.curves[0].start_points[0].angle
+        mat = np.array([[np.cos(np.deg2rad(angle)), -np.sin(np.deg2rad(angle))],
+                        [np.sin(np.deg2rad(angle)), np.cos(np.deg2rad(angle))]])
         change_x = -self.curves[0].start_points[0]()[0] / 55.528
         change_y = -self.curves[0].start_points[0]()[1] / 55.528
 
@@ -522,12 +524,10 @@ class Boards(object):
                 p[1] += change_y
                 p[1] = -p[1]
 
-                x = np.cos(np.deg2rad(angle)) * p[0] - np.sin(np.deg2rad(angle)) * p[1]
-                y = np.sin(np.deg2rad(angle)) * p[0] + np.cos(np.deg2rad(angle)) * p[1]
-
-                p[0] = x
-                p[1] = y
-
+                new_p = np.dot(mat, p)
+                p[0] = new_p[0]
+                p[1] = new_p[1]
+                
             # curve = Bezier(self.curves[seg].curve.p0 / 55.528, self.curves[seg].curve.p1 / 55.528,
             #                self.curves[seg].curve.p2 / 55.528, self.curves[seg].curve.p3 / 55.528,
             #                self.curves[seg].curve.p4 / 55.528, self.curves[seg].curve.p5 / 55.528)
