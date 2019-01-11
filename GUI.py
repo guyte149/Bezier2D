@@ -3,7 +3,7 @@ import time
 from Tkinter import *
 import csv
 import keyboard
-from PIL import ImageTk, Image
+from PIL import ImageTk, Image, ImageGrab
 import numpy as np
 from bezyea import *
 
@@ -439,13 +439,18 @@ class Boards(object):
                 list_curves.append(list_points)
             pickle.dump(list_curves, f)
             f.close()
-            # excel file
+            # field pic
+            im = ImageGrab.grab()
+            im.save(r'curves\{}-field.jpg'.format(file_name))
+            # excel file and traj pic
+            self.file_name = file_name
             traj_data = self.get_set_points()
             with open(r'curves\{}.csv'.format(file_name), 'wb') as csv_file:
                 file_writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
                 file_writer.writerow(['Time', 'X', 'Y', 'Angle'])
                 for i in xrange(len(traj_data[0])):
-                    file_writer.writerow([traj_data[0][i][0], traj_data[0][i][1], traj_data[0][i][2], traj_data[1][i][0]])
+                    file_writer.writerow(
+                        [traj_data[0][i][0], traj_data[0][i][1], traj_data[0][i][2], traj_data[1][i][0]])
                 csv_file.close()
 
     def load(self):
@@ -532,7 +537,7 @@ class Boards(object):
                 new_p = np.dot(mat, p)
                 p[0] = new_p[0]
                 p[1] = new_p[1]
-                
+
             # curve = Bezier(self.curves[seg].curve.p0 / 55.528, self.curves[seg].curve.p1 / 55.528,
             #                self.curves[seg].curve.p2 / 55.528, self.curves[seg].curve.p3 / 55.528,
             #                self.curves[seg].curve.p4 / 55.528, self.curves[seg].curve.p5 / 55.528)
@@ -581,6 +586,7 @@ class Boards(object):
 
         if not self.file_name:
             plt.show()
+        plt.savefig(r'curves\{}-traj.jpg'.format(self.file_name))
         return points_time_traj, angles_traj
         # file_name = self.set_trajectory_text.get("1.0", 'end-1c')
         # with open(r'curves\{}'.format(file_name), 'wb') as f:
