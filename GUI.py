@@ -311,6 +311,8 @@ class Boards(object):
         self.num_curve = 0
         self.counters = [0]
 
+        self.file_name = False
+
         self.curves = [Curves(self.master, self.canvas, True, self.place, self.num_curve, False)]
         self.canvas_on = False
 
@@ -420,6 +422,7 @@ class Boards(object):
 
     def save(self):
         file_name = self.name_file_text_save.get("1.0", 'end-1c')
+        self.file_name = file_name
         with open(r'curves\{}.pkl'.format(file_name), 'wb') as f:
             list_curves = []
             for seg in range(len(self.curves)):
@@ -436,12 +439,14 @@ class Boards(object):
                 list_curves.append(list_points)
             pickle.dump(list_curves, f)
             f.close()
-
             # excel file
             traj_data = self.get_set_points()
-            with open(r'curves\{}.csv'.format(file_name), 'wb') as csvfile:
-                filewriter = csv.writer(csvfile, csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-                filewriter.writerow(['Time', 'X', 'Y', 'Angle'])
+            with open(r'curves\{}.csv'.format(file_name), 'wb') as csv_file:
+                file_writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                file_writer.writerow(['Time', 'X', 'Y', 'Angle'])
+                for i in xrange(len(traj_data[0])):
+                    file_writer.writerow([traj_data[0][i][0], traj_data[0][i][1], traj_data[0][i][2], traj_data[1][i][0]])
+                csv_file.close()
 
     def load(self):
         file_name = self.name_file_text_load.get("1.0", 'end-1c')
@@ -574,7 +579,8 @@ class Boards(object):
         plt.subplot(122)
         plt.plot(v_traj.T[0], v_traj.T[1])
 
-        plt.show()
+        if not self.file_name:
+            plt.show()
         return points_time_traj, angles_traj
         # file_name = self.set_trajectory_text.get("1.0", 'end-1c')
         # with open(r'curves\{}'.format(file_name), 'wb') as f:
