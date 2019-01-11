@@ -22,6 +22,9 @@ class PointStart(object):
         self.num_curve = num_curve
         self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
                                             fill="blue")
+        self.rect = self.canvas.create_rectangle(self.x_point - 10, self.y_point - 5, self.x_point + 10,
+                                                 self.y_point + 5, fill="", outline="blue")
+
         self.create_window()
 
     def __call__(self, *args, **kwargs):
@@ -79,6 +82,7 @@ class PointStart(object):
             keyboard.press_and_release('backspace')
         input = []
         self.canvas.delete(self.oval)
+        self.canvas.delete(self.rect)
         # if self.x_point == 0 and self.y_point == 0:
         if not self.load:
             input.append(self.text0.get("1.0", 'end-1c'))
@@ -92,6 +96,8 @@ class PointStart(object):
         self.y_point *= 55.528
         self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
                                             fill="blue")
+        self.rect = self.canvas.create_rectangle(self.x_point - 10, self.y_point - 5, self.x_point + 10,
+                                                 self.y_point + 5, fill="", outline="blue")
 
         board_curve.create_canvas()
 
