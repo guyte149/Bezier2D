@@ -90,10 +90,11 @@ class PointStart(object):
             input.append(self.text2.get("1.0", 'end-1c'))
             self.x_point = float(input[0])
             self.y_point = float(input[1])
-            self.angle = float(input[2])
+            self.angle = -float(input[2])
         self.load = False
         self.x_point *= 55.528
         self.y_point *= 55.528
+        self.y_point = 457 - self.y_point
         self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
                                             fill="blue")
         self.rect = self.canvas.create_rectangle(self.x_point - 10, self.y_point - 5, self.x_point + 10,
@@ -339,7 +340,7 @@ class Boards(object):
             messeges_x[i - 1].place(x=i * 55 + 12, y=465)
         for i in range(1, 9, 1):
             messeges_y.append(Message(self.master, text=i))
-            messeges_y[i - 1].place(x=0, y=i * 55)
+            messeges_y[i - 1].place(x=0, y=457 - i * 55)
 
     def create_canvas(self, res=1000.0):
         for i in range(len(self.counters)):
@@ -512,6 +513,7 @@ class Boards(object):
             for p in (p0, p1, p2, p3, p4, p5):
                 p[0] += change_x
                 p[1] += change_y
+                p[1] = -p[1]
 
             # curve = Bezier(self.curves[seg].curve.p0 / 55.528, self.curves[seg].curve.p1 / 55.528,
             #                self.curves[seg].curve.p2 / 55.528, self.curves[seg].curve.p3 / 55.528,
