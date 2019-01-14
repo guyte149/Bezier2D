@@ -1,5 +1,6 @@
 import pickle
 import time
+import tkFileDialog
 from Tkinter import *
 import csv
 import keyboard
@@ -28,6 +29,12 @@ class PointStart(object):
         self.create_window()
 
     def __call__(self, *args, **kwargs):
+        self.canvas.delete(self.oval)
+        self.canvas.delete(self.rect)
+        self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
+                                            fill="blue")
+        self.rect = self.canvas.create_rectangle(self.x_point - 10, self.y_point - 5, self.x_point + 10,
+                                                 self.y_point + 5, fill="", outline="blue")
         return np.array([self.x_point, self.y_point])
 
     def create_window(self):
@@ -454,8 +461,11 @@ class Boards(object):
                 csv_file.close()
 
     def load(self):
-        file_name = self.name_file_text_load.get("1.0", 'end-1c')
-        with open(r'curves\{}'.format(file_name), "rb") as input_file:
+        file_name = tkFileDialog.askopenfilenames(parent=self.master, title='Choose a file')
+        file_name = self.master.tk.splitlist(file_name)
+        # file_name = self.name_file_text_load.get("1.0", 'end-1c')
+        # with open(r'curves\{}'.format(file_name), "rb") as input_file:
+        with open(r'{}'.format(file_name[0]), 'rb') as input_file:
             list_curves = pickle.load(input_file)
             for seg in range(len(list_curves)):
                 self.counters[seg] = 4
@@ -490,6 +500,7 @@ class Boards(object):
                 print self.curves[seg].start_points[0]()
                 print list_curves[seg][0]
                 self.place += 25
+            # input_file.close()
             self.create_canvas()
 
     def get_set_points(self):
