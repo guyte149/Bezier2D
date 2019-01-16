@@ -29,12 +29,8 @@ class PointStart(object):
         self.create_window()
 
     def __call__(self, *args, **kwargs):
-        self.canvas.delete(self.oval)
-        self.canvas.delete(self.rect)
-        self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
-                                            fill="blue")
-        self.rect = self.canvas.create_rectangle(self.x_point - 10, self.y_point - 5, self.x_point + 10,
-                                                 self.y_point + 5, fill="", outline="blue")
+        self.canvas.coords(self.oval, self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3)
+        self.canvas.coords(self.rect, self.x_point - 10, self.y_point - 5, self.x_point + 10, self.y_point + 5)
         return np.array([self.x_point, self.y_point])
 
     def create_window(self):
@@ -88,8 +84,6 @@ class PointStart(object):
         if is_backspace:
             keyboard.press_and_release('backspace')
         input = []
-        self.canvas.delete(self.oval)
-        self.canvas.delete(self.rect)
         # if self.x_point == 0 and self.y_point == 0:
         if not self.load:
             input.append(self.text0.get("1.0", 'end-1c'))
@@ -102,10 +96,8 @@ class PointStart(object):
         self.x_point *= 55.528
         self.y_point *= 55.528
         self.y_point = 457 - self.y_point
-        self.oval = self.canvas.create_oval(self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3,
-                                            fill="blue")
-        self.rect = self.canvas.create_rectangle(self.x_point - 10, self.y_point - 5, self.x_point + 10,
-                                                 self.y_point + 5, fill="", outline="blue")
+        self.canvas.coords(self.oval, self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3)
+        self.canvas.coords(self.rect, self.x_point - 10, self.y_point - 5, self.x_point + 10, self.y_point + 5)
 
         board_curve.create_canvas()
 
@@ -129,20 +121,18 @@ class Point(object):
         return np.array([float(self.x), float(self.y)])
 
     def mouse_clicked(self, event):
-        self.canvas.delete(self.oval)
         self.x = event.x
         self.y = event.y
-        self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
+        self.canvas.coords(self.oval, self.x - 5, self.y - 5, self.x + 5, self.y + 5)
         self.master.unbind("<Button-1>")
         self.to_stop = True
         self.after = True
         board_curve.create_canvas()
 
     def change_place_for_input(self, x, y):
-        self.canvas.delete(self.oval)
         self.x = x
         self.y = y
-        self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
+        self.canvas.coords(self.oval, self.x - 5, self.y - 5, self.x + 5, self.y + 5)
         self.after = False
 
 
@@ -403,17 +393,11 @@ class Boards(object):
         self.load_button = Button(self.master, text="load", command=self.load)
         self.load_button.place(x=1164, y=200)
 
-        self.name_file_text_load = Text(self.master, width=10, height=1)
-        self.name_file_text_load.place(x=1120, y=250)
-
         self.button_add_curve = Button(self.master, text="connect curve", command=self.button_connect_curve)
         self.button_add_curve.place(x=1164, y=300)
 
         self.set_trajectory_button = Button(self.master, text="set trajectory", command=self.get_set_points)
         self.set_trajectory_button.place(x=1164, y=350)
-
-        self.set_trajectory_text = Text(self.master, width=10, height=1)
-        self.set_trajectory_text.place(x=1164, y=400)
 
     def button_connect_curve(self):
         self.num_curve += 1
