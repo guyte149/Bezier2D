@@ -210,7 +210,7 @@ class Curves(object):
     def correct_angle(self, to_work):
         if not to_work:
             if self.first:
-                if self.start_points[0].angle != 90:
+                if self.start_points[0].angle != -90 and self.start_points[0].angle != -270:
                     # find first start point linear equation
                     x0 = self.start_points[0].x_point
                     y0 = self.start_points[0].y_point
@@ -235,7 +235,7 @@ class Curves(object):
                         y0 = i
                         self.canvas.create_oval(x, y0, x, y0, fill="salmon")
 
-                if self.start_points[1].angle != 90:
+                if self.start_points[1].angle != -90 and self.start_points[1].angle != -270:
                     # find second start point linear equation
                     x0 = self.start_points[1].x_point
                     y0 = self.start_points[1].y_point
@@ -261,7 +261,7 @@ class Curves(object):
                         self.canvas.create_oval(x, y0, x, y0, fill="salmon")
 
             else:
-                if self.start_points[0].angle != 90:
+                if self.start_points[0].angle != -90 and self.start_points[0].angle != -270:
                     # find second start point linear equation
                     x0 = self.start_points[0].x_point
                     y0 = self.start_points[0].y_point
