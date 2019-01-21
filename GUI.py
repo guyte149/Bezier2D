@@ -286,6 +286,16 @@ class Curves(object):
                         y0 = i
                         self.canvas.create_oval(x, y0, x, y0, fill="salmon")
 
+            for point in self.points:
+                if point.x < 0:
+                    point.change_place_for_input(0, point.y)
+                elif point.x > 919:
+                    point.change_place_for_input(459, point.y)
+                if point.y < 0:
+                    point.change_place_for_input(point.x, 0)
+                elif point.y > 459:
+                    point.change_place_for_input(point.x, 228)
+
 
 class Boards(object):
     def __init__(self, x, y, master, img):
