@@ -1,3 +1,4 @@
+import os
 import pickle
 import time
 import tkFileDialog
@@ -424,7 +425,12 @@ class Boards(object):
     def save(self):
         file_name = self.name_file_text_save.get("1.0", 'end-1c')
         self.file_name = file_name
-        with open(r'curves\{}.pkl'.format(file_name), 'wb') as f:
+        start_dir = os.getcwd()
+        os.chdir(start_dir + '\\curves')
+        if not os.path.exists('./' + file_name + '/'):
+            os.makedirs('./' + file_name + '/')
+        os.chdir('./' + file_name + '/')
+        with open(r'{}.pkl'.format(file_name), 'wb') as f:
             list_curves = []
             for seg in range(len(self.curves)):
                 list_points = []
@@ -442,17 +448,18 @@ class Boards(object):
             f.close()
             # field pic
             im = ImageGrab.grab()
-            im.save(r'curves\{}-field.jpg'.format(file_name))
+            im.save(r'{}-field.jpg'.format(file_name))
             # excel file and traj pic
             self.file_name = file_name
             traj_data = self.get_set_points()
-            with open(r'curves\{}.csv'.format(file_name), 'wb') as csv_file:
+            with open(r'{}.csv'.format(file_name), 'wb') as csv_file:
                 file_writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
                 file_writer.writerow(['Time', 'X', 'Y', 'Angle'])
                 for i in xrange(len(traj_data[0])):
                     file_writer.writerow(
                         [traj_data[0][i][0], traj_data[0][i][1], traj_data[0][i][2], traj_data[1][i][0]])
                 csv_file.close()
+        os.chdir(start_dir)
 
     def load(self):
         file_name = tkFileDialog.askopenfilenames(parent=self.master, title='Choose a file')
@@ -591,7 +598,7 @@ class Boards(object):
 
         if not self.file_name:
             plt.show()
-        plt.savefig(r'curves\{}-traj.jpg'.format(self.file_name))
+        plt.savefig(r'{}-traj.jpg'.format(self.file_name))
         return points_time_traj, angles_traj
         # file_name = self.set_trajectory_text.get("1.0", 'end-1c')
         # with open(r'curves\{}'.format(file_name), 'wb') as f:
