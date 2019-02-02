@@ -507,7 +507,7 @@ class Boards(object):
     def get_set_points(self):
         max_ar = 3
         max_at = 3
-        max_v = 3
+        max_v = 5
         width = 0.6
         dt = 0.01
 
