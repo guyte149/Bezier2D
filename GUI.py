@@ -457,7 +457,8 @@ class Boards(object):
                 file_writer.writerow(['Time', 'X', 'Y', 'Angle'])
                 for i in xrange(len(traj_data[0])):
                     file_writer.writerow(
-                        [traj_data[0][i][0], traj_data[0][i][1], traj_data[0][i][2], traj_data[1][i][0]])
+                        # [traj_data[0][i][0], traj_data[0][i][1], traj_data[0][i][2], traj_data[1][i][0]])
+                        [traj_data[0][i][0], traj_data[0][i][1], -traj_data[0][i][2], -traj_data[1][i][0]])
                 csv_file.close()
         os.chdir(start_dir)
 
@@ -505,10 +506,10 @@ class Boards(object):
             self.create_canvas()
 
     def get_set_points(self):
-        max_ar = 3
+        max_ar = 1.5
         max_at = 3
         max_v = 5
-        width = 0.6
+        width = 0.755
         dt = 0.01
 
         angle = self.curves[0].start_points[0].angle
