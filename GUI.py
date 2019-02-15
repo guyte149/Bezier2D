@@ -9,6 +9,16 @@ from PIL import ImageTk, Image, ImageGrab
 import numpy as np
 from bezyea import *
 
+pixel_to_meter = 55.528
+width_picture = 919
+height_picture = 457
+
+max_ar = 1.5
+max_at = 3
+max_v = 5
+width = 0.755
+dt = 0.01
+
 
 class PointStart(object):
     def __init__(self, master, canvas, x, y, num_curve, index, load):
@@ -94,9 +104,9 @@ class PointStart(object):
             self.y_point = float(input[1])
             self.angle = -float(input[2])
         self.load = False
-        self.x_point *= 55.528
-        self.y_point *= 55.528
-        self.y_point = 457 - self.y_point
+        self.x_point *= pixel_to_meter
+        self.y_point *= pixel_to_meter
+        self.y_point = height_picture - self.y_point
         self.canvas.coords(self.oval, self.x_point - 3, self.y_point - 3, self.x_point + 3, self.y_point + 3)
         self.canvas.coords(self.rect, self.x_point - 10, self.y_point - 5, self.x_point + 10, self.y_point + 5)
 
@@ -290,7 +300,7 @@ class Curves(object):
             for point in self.points:
                 if point.x < 0:
                     point.change_place_for_input(0, point.y)
-                elif point.x > 919:
+                elif point.x > width_picture:
                     point.change_place_for_input(459, point.y)
                 if point.y < 0:
                     point.change_place_for_input(point.x, 0)
@@ -309,7 +319,7 @@ class Boards(object):
                        "pink", "orange", "grey", "brown", "purple"]
 
         # self.canvas = Canvas(self.master, width=1000, height=406)
-        self.canvas = Canvas(self.master, width=919, height=457)
+        self.canvas = Canvas(self.master, width=width_picture, height=height_picture)
         self.img = img
         self.canvas.create_image(459, 228, image=self.img)
         self.canvas.place(x=20, y=5)
@@ -350,7 +360,7 @@ class Boards(object):
             messeges_x[i - 1].place(x=i * 55 + 12, y=465)
         for i in range(1, 9, 1):
             messeges_y.append(Message(self.master, text=i))
-            messeges_y[i - 1].place(x=0, y=457 - i * 55)
+            messeges_y[i - 1].place(x=0, y=height_picture - i * 55)
 
     def create_canvas(self, res=1000.0):
         for i in range(len(self.counters)):
@@ -506,17 +516,11 @@ class Boards(object):
             self.create_canvas()
 
     def get_set_points(self):
-        max_ar = 1.5
-        max_at = 3
-        max_v = 5
-        width = 0.755
-        dt = 0.01
-
         angle = self.curves[0].start_points[0].angle
         mat = np.array([[np.cos(np.deg2rad(angle)), -np.sin(np.deg2rad(angle))],
                         [np.sin(np.deg2rad(angle)), np.cos(np.deg2rad(angle))]])
-        change_x = -self.curves[0].start_points[0]()[0] / 55.528
-        change_y = -self.curves[0].start_points[0]()[1] / 55.528
+        change_x = -self.curves[0].start_points[0]()[0] / pixel_to_meter
+        change_y = -self.curves[0].start_points[0]()[1] / pixel_to_meter
 
         list_curves = []
         # for seg in range(len(self.curves)):
@@ -535,12 +539,12 @@ class Boards(object):
         #         list_set_points.append(self.curves[seg].start_points[0]())
         #         list_curves.append(list_curves)
         for seg in range(len(self.curves)):
-            p0 = self.curves[seg].curve.p0 / 55.528
-            p1 = self.curves[seg].curve.p1 / 55.528
-            p2 = self.curves[seg].curve.p2 / 55.528
-            p3 = self.curves[seg].curve.p3 / 55.528
-            p4 = self.curves[seg].curve.p4 / 55.528
-            p5 = self.curves[seg].curve.p5 / 55.528
+            p0 = self.curves[seg].curve.p0 / pixel_to_meter
+            p1 = self.curves[seg].curve.p1 / pixel_to_meter
+            p2 = self.curves[seg].curve.p2 / pixel_to_meter
+            p3 = self.curves[seg].curve.p3 / pixel_to_meter
+            p4 = self.curves[seg].curve.p4 / pixel_to_meter
+            p5 = self.curves[seg].curve.p5 / pixel_to_meter
 
             for p in (p0, p1, p2, p3, p4, p5):
                 p[0] += change_x
@@ -551,9 +555,9 @@ class Boards(object):
                 p[0] = new_p[0]
                 p[1] = new_p[1]
 
-            # curve = Bezier(self.curves[seg].curve.p0 / 55.528, self.curves[seg].curve.p1 / 55.528,
-            #                self.curves[seg].curve.p2 / 55.528, self.curves[seg].curve.p3 / 55.528,
-            #                self.curves[seg].curve.p4 / 55.528, self.curves[seg].curve.p5 / 55.528)
+            # curve = Bezier(self.curves[seg].curve.p0 / pixel_to_meter, self.curves[seg].curve.p1 / pixel_to_meter,
+            #                self.curves[seg].curve.p2 / pixel_to_meter, self.curves[seg].curve.p3 / pixel_to_meter,
+            #                self.curves[seg].curve.p4 / pixel_to_meter, self.curves[seg].curve.p5 / pixel_to_meter)
 
             curve = Bezier(p0, p1, p2, p3, p4, p5)
 
@@ -612,7 +616,7 @@ master.attributes('-fullscreen', True)
 
 path = "filed2019big.png"
 image = Image.open(path)
-image = image.resize((919, 457), Image.ANTIALIAS)
+image = image.resize((width_picture, height_picture), Image.ANTIALIAS)
 img = ImageTk.PhotoImage(image)
 
 board_curve = Boards(0, 425, master, img)
