@@ -57,13 +57,13 @@ class PointStart(object):
         self.messege3 = Message(self.master, text="degree", width=40)
         self.messege3.place(x=self.x + 300, y=self.y)
 
-        self.text0 = Text(self.master, width=5, height=1)
+        self.text0 = Text(self.master, width=7, height=1)
         self.text0.place(x=self.x + 125, y=self.y)
 
-        self.text1 = Text(self.master, width=5, height=1)
+        self.text1 = Text(self.master, width=7, height=1)
         self.text1.place(x=self.x + 225, y=self.y)
 
-        self.text2 = Text(self.master, width=5, height=1)
+        self.text2 = Text(self.master, width=7, height=1)
         self.text2.place(x=self.x + 350, y=self.y)
 
         text_list = self.text0, self.text1, self.text2
