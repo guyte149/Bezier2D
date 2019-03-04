@@ -13,8 +13,8 @@ pixel_to_meter = 55.528
 width_picture = 919
 height_picture = 457
 
-max_ar = 1.5
-max_at = 1.8
+max_ar = 2
+max_at = 3
 max_v = 5
 width = 0.755
 dt = 0.01
@@ -29,6 +29,7 @@ class PointStart(object):
         self.y = y
         self.load = load
         self.angle = 0
+
         self.x_point = 0
         self.y_point = 0
         self.num_curve = num_curve
@@ -516,13 +517,18 @@ class Boards(object):
             # self.messages = []
             for seg in range(len(self.curves)):
                 for i in range(len(self.curves[seg].start_points)):
-                    self.message = Message(self.master, text="point from load x = {} y = {} angle = {}".format(
-                        self.curves[seg].start_points[i].x_point / pixel_to_meter,
-                        (height_picture - self.curves[seg].start_points[i].y_point) / pixel_to_meter,
-                        -self.curves[seg].start_points[i].angle), width=400)
+                    x = self.curves[seg].start_points[i].x_point / pixel_to_meter
+                    y = (height_picture - self.curves[seg].start_points[i].y_point) / pixel_to_meter
+                    angle = -self.curves[seg].start_points[i].angle
+                    self.message = Message(self.master,
+                                           text="point from load x = {} y = {} angle = {}".format(x, y, angle),
+                                           width=400)
                     # self.messages.append(message)
                     # self.messege[seg].place(x=self.x + 100, y=self.y)
                     self.message.place(x=self.curves[seg].start_points[i].x + 500, y=self.curves[seg].start_points[i].y)
+                    self.curves[seg].start_points[i].text0.insert(END, x)
+                    self.curves[seg].start_points[i].text1.insert(END, y)
+                    self.curves[seg].start_points[i].text2.insert(END, angle)
             self.create_canvas()
 
     def get_set_points(self):
