@@ -2,8 +2,11 @@ import os
 import pickle
 import time
 import tkFileDialog
+import urllib
 from Tkinter import *
 import csv
+from ftplib import FTP
+
 import keyboard
 from PIL import ImageTk, Image, ImageGrab
 import numpy as np
@@ -13,8 +16,8 @@ pixel_to_meter = 55.528
 width_picture = 919
 height_picture = 457
 
-max_ar = 2
-max_at = 3
+max_ar = 3.5
+max_at = 3.5
 max_v = 5
 width = 0.755
 dt = 0.01
@@ -470,6 +473,17 @@ class Boards(object):
                     file_writer.writerow(
                         # [traj_data[0][i][0], traj_data[0][i][1], traj_data[0][i][2], traj_data[1][i][0]])
                         [traj_data[0][i][0], traj_data[0][i][1], -traj_data[0][i][2], -traj_data[1][i][0]])
+
+                # try:
+                #     conn = FTP('10.30.75.2')
+                #     conn.connect()
+                #     print "connected"
+                #     conn.storbinary('Paths/{}.csv'.format(file_name), csv_file)
+                #     # urllib.urlretrieve('ftp://10.30.75.2/Paths/', file_name)
+                #
+                # except IOError as e:
+                #     print "robot disconnected"
+
                 csv_file.close()
         os.chdir(start_dir)
 
