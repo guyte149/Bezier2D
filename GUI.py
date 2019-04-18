@@ -17,7 +17,7 @@ width_picture = 919
 height_picture = 457
 
 max_ar = 3.5
-max_at = 3.5
+max_at = 4
 max_v = 5
 width = 0.755
 dt = 0.01
