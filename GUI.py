@@ -124,7 +124,7 @@ class Point(object):
         self.canvas = canvas
         self.color = color
         self.to_stop = to_stop
-        self.master.bind("<Button-1>", self.mouse_clicked)
+        # self.master.bind("<Button-1>", self.mouse_clicked)
         self.index = index
         self.x = 10 + self.index * 100
         self.y = 10
@@ -132,6 +132,7 @@ class Point(object):
         self.last_y = last_y
         self.after = False
         self.oval = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, fill=self.color)
+        self.pressed = False
 
     def __call__(self, *args, **kwargs):
         return np.array([float(self.x), float(self.y)])
@@ -140,7 +141,7 @@ class Point(object):
         self.x = event.x
         self.y = event.y
         self.canvas.coords(self.oval, self.x - 5, self.y - 5, self.x + 5, self.y + 5)
-        self.master.unbind("<Button-1>")
+        # self.master.unbind("<Button-1>")
         self.to_stop = True
         self.after = True
         board_curve.create_canvas()
@@ -344,7 +345,9 @@ class Boards(object):
 
         self.draw_scales()
 
-        self.master.bind("<Button-3>", self.change_point)
+        # self.master.bind("<Button-3>", self.change_point)
+        self.canvas.bind('<B1-Motion>', self.mouse_drag)
+        self.canvas.bind('<ButtonRelease-1>', self.mouse_release)
         self.create_buttons()
 
         self.ovals_curves = []
@@ -356,6 +359,27 @@ class Boards(object):
         t = args[0]
         seg = args[1]
         return self.curves[seg](t)
+
+    def mouse_drag(self, event):
+        for curve in self.curves:
+            for point in curve.points:
+                if point.x - 5 <= event.x <= point.x + 5 and point.y - 5 <= event.y <= point.y + 5:
+                    point.pressed = True
+
+        self.move_points(event)
+
+    def move_points(self, event):
+        for curve in self.curves:
+            for point in curve.points:
+                if point.pressed:
+                    point.change_place_for_input(event.x, event.y)
+                    self.create_canvas()
+                    return
+
+    def mouse_release(self, event):
+        for curve in self.curves:
+            for point in curve.points:
+                point.pressed = False
 
     def draw_scales(self):
         messeges_x = []
